@@ -1,57 +1,60 @@
 <template>
-  <div v-show="personalInfoShow">
-    <personal-info class="personal-info"/>
-  </div>
-
+<!--  <div v-show="personalInfoShow">-->
+<!--    <el-alert v-show="alertShow" style="width: 600px" :closable="false" title="您的个人资料尚未完善，请通过左侧导航栏<完善资料>完善个人资料" type="warning" show-icon class="alert-info"/>-->
+<!--  </div>-->
+<!--  <div v-show="infoEditShow">-->
+<!--    <info-edit class="info-edit"/>-->
+<!--  </div>-->
+<router-view/>
 <div>
-  <el-form :model="updateData" label-width="120px" class="demo-border"
-           :rules="rules"
-  >
-<!--    <el-select v-model="select" class="m-2" placeholder="请先选择登录入口" size="large" style="position: relative;left: 180px">-->
-<!--      <el-option-->
-<!--          v-for="item in loginCharacters"-->
-<!--          :key="item.value"-->
-<!--          :label="item.label"-->
-<!--          :value="item.value"-->
-<!--      />-->
-<!--    </el-select>-->
-<!--    <el-row :gutter="20">-->
-<!--      <el-col :span="6"><div class="grid-content ep-bg-purple" /></el-col>-->
-<!--      <el-col :span="6"><div class="grid-content ep-bg-purple" /></el-col>-->
-<!--      <el-col :span="6"><div class="grid-content ep-bg-purple" /></el-col>-->
-<!--      <el-col :span="6"><div class="grid-content ep-bg-purple" /></el-col>-->
-<!--    </el-row>-->
-<!--      <el-form-item class="input-style" label="密码" prop="loginPassword">-->
-<!--        <el-input type="password" v-model="form.loginPassword" show-password placeholder="输入密码"/>-->
-<!--      </el-form-item>-->
-      <!--                <el-form-item class="text-style">-->
-      <!--                  <el-text type="primary">-->
-      <!--                    没有账号？<el-button type="primary" plain>注册一个</el-button>-->
-      <!--                  </el-text>-->
-      <!--                </el-form-item>-->
-<!--      <el-form-item class="button-style">-->
-<!--        <el-button type="primary" @click="onSubmit">登录</el-button>-->
-<!--      </el-form-item>-->
-  </el-form>
-
+<!--  <el-form :model="updateData" label-width="120px" class="demo-border"-->
+<!--           :rules="rules"-->
+<!--  >-->
+<!--&lt;!&ndash;    <el-select v-model="select" class="m-2" placeholder="请先选择登录入口" size="large" style="position: relative;left: 180px">&ndash;&gt;-->
+<!--&lt;!&ndash;      <el-option&ndash;&gt;-->
+<!--&lt;!&ndash;          v-for="item in loginCharacters"&ndash;&gt;-->
+<!--&lt;!&ndash;          :key="item.value"&ndash;&gt;-->
+<!--&lt;!&ndash;          :label="item.label"&ndash;&gt;-->
+<!--&lt;!&ndash;          :value="item.value"&ndash;&gt;-->
+<!--&lt;!&ndash;      />&ndash;&gt;-->
+<!--&lt;!&ndash;    </el-select>&ndash;&gt;-->
+<!--&lt;!&ndash;    <el-row :gutter="20">&ndash;&gt;-->
+<!--&lt;!&ndash;      <el-col :span="6"><div class="grid-content ep-bg-purple" /></el-col>&ndash;&gt;-->
+<!--&lt;!&ndash;      <el-col :span="6"><div class="grid-content ep-bg-purple" /></el-col>&ndash;&gt;-->
+<!--&lt;!&ndash;      <el-col :span="6"><div class="grid-content ep-bg-purple" /></el-col>&ndash;&gt;-->
+<!--&lt;!&ndash;      <el-col :span="6"><div class="grid-content ep-bg-purple" /></el-col>&ndash;&gt;-->
+<!--&lt;!&ndash;    </el-row>&ndash;&gt;-->
+<!--&lt;!&ndash;      <el-form-item class="input-style" label="密码" prop="loginPassword">&ndash;&gt;-->
+<!--&lt;!&ndash;        <el-input type="password" v-model="form.loginPassword" show-password placeholder="输入密码"/>&ndash;&gt;-->
+<!--&lt;!&ndash;      </el-form-item>&ndash;&gt;-->
+<!--      &lt;!&ndash;                <el-form-item class="text-style">&ndash;&gt;-->
+<!--      &lt;!&ndash;                  <el-text type="primary">&ndash;&gt;-->
+<!--      &lt;!&ndash;                    没有账号？<el-button type="primary" plain>注册一个</el-button>&ndash;&gt;-->
+<!--      &lt;!&ndash;                  </el-text>&ndash;&gt;-->
+<!--      &lt;!&ndash;                </el-form-item>&ndash;&gt;-->
+<!--&lt;!&ndash;      <el-form-item class="button-style">&ndash;&gt;-->
+<!--&lt;!&ndash;        <el-button type="primary" @click="onSubmit">登录</el-button>&ndash;&gt;-->
+<!--&lt;!&ndash;      </el-form-item>&ndash;&gt;-->
+<!--  </el-form>-->
   <el-menu
       active-text-color="#337ecc"
       default-active="1"
       background-color="#FAFCFF"
       class="el-menu-vertical-demo"
       text-color="#303133"
+      :router="true"
       @select=selectHandle
   >
 
-    <el-menu-item index="personalInfo">
+    <el-menu-item index="/personalCenter/personalInfo">
       <el-icon><Stamp /></el-icon>
       <span>个人信息</span>
     </el-menu-item>
-    <el-menu-item index="2">
+    <el-menu-item index="/personalCenter/infoEdit">
       <el-icon><Edit /></el-icon>
       <span>完善资料</span>
     </el-menu-item>
-    <el-menu-item index="3">
+    <el-menu-item index="/personalCenter/userQualification">
       <el-icon><CircleCheckFilled /></el-icon>
       <span>资质认证</span>
     </el-menu-item>
@@ -63,14 +66,16 @@
 
 <script>
 import PersonalInfo from "@/components/PersonalInfo";
+import InfoEdit from "@/components/InfoEdit";
 export default {
   name: "PersonalCenter",
   components:{
-    PersonalInfo
   },
   data(){
     return{
+      alertShow:true,
       personalInfoShow:false,
+      infoEditShow:false,
       loginState:"",
       updateData:{
 
@@ -82,10 +87,9 @@ export default {
   },
   methods:{
     selectHandle(key){
-      if (key === 'personalInfo'){
-          this.personalInfoShow = true
-      }
-    }
+
+    },
+
   },
   mounted() {
     this.loginState = window.localStorage.getItem('loginState')
@@ -112,9 +116,6 @@ export default {
   width: 200px;
   height: 700px;
 }
-.personal-info{
-  position: absolute;
-  top: 200px;
-  left: 300px;
-}
+
+
 </style>

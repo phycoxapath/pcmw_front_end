@@ -33,8 +33,21 @@ const routes = [
   {
     path: '/personalCenter',
     name: 'personalCenter',
-    component: () => import('../views/PersonalCenter')
-
+    component: () => import('../views/PersonalCenter'),
+    children:[
+      {
+        path:'personalInfo',
+        component: () => import('../components/PersonalInfo')
+      },
+      {
+        path: 'infoEdit',
+        component: () => import('../components/InfoEdit')
+      },
+      {
+        path: 'userQualification',
+        component: () => import('../components/UserQualification')
+      }
+    ]
   }
 
 ]
