@@ -54,8 +54,9 @@ export default {
   },
   mounted() {
 
-    if (window.localStorage.getItem('loginRole') === 'user'){
-        axios.get("http://localhost/users/"+window.localStorage.getItem('loginState')).then(res =>{
+
+        axios.get("http://localhost/"+window.localStorage.getItem('loginRole')+"/"+window.localStorage.getItem('loginState')).then(res =>{
+
           let i = 0,j = 0;
           for (const resKey in res.data) {
             if (resKey === 'password') {
@@ -78,13 +79,7 @@ export default {
             }
           }
         })
-    }
-    else if (window.localStorage.getItem('loginRole') === 'doctor'){
 
-    }
-    else if (window.localStorage.getItem('loginRole') === 'hospital'){
-
-    }
   }
 
 }

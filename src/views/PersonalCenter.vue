@@ -58,6 +58,10 @@
       <el-icon><CircleCheckFilled /></el-icon>
       <span>资质认证</span>
     </el-menu-item>
+    <el-menu-item index="/personalCenter/modifyPassword">
+      <el-icon><EditPen /></el-icon>
+      <span>修改密码</span>
+    </el-menu-item>
 
   </el-menu>
 </div>
@@ -65,8 +69,7 @@
 </template>
 
 <script>
-import PersonalInfo from "@/components/PersonalInfo";
-import InfoEdit from "@/components/InfoEdit";
+import axios from "axios";
 export default {
   name: "PersonalCenter",
   components:{
@@ -93,6 +96,9 @@ export default {
   },
   mounted() {
     this.loginState = window.localStorage.getItem('loginState')
+    axios.get("http://localhost/"+window.localStorage.getItem('loginRole')+"/"+this.loginState).then(res =>{
+      window.localStorage.setItem('id',res.data.id)
+    })
   }
 }
 </script>

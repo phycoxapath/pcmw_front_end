@@ -10,9 +10,10 @@
         </el-header>
         <el-main>
           <div>
-            <el-text class="mx-1" size="large" style="font-size: 30px;position: relative;left: 700px">登 录</el-text>
+            <el-text class="mx-1" size="large" style="font-size: 30px;position: relative;left: 700px;bottom: 20px">登 录</el-text>
               <el-form :model="form" label-width="120px" class="demo-border"
                 :rules="rules"
+                ref="form"
               >
                 <el-select v-model="select" class="m-2" placeholder="请先选择登录入口" size="large" style="position: relative;left: 180px">
                   <el-option
@@ -37,6 +38,9 @@
                 <el-form-item class="button-style">
                   <el-button type="primary" @click="onSubmit">登录</el-button>
                 </el-form-item>
+                <el-form-item>
+                  <el-button type="primary" link @click="modifyPassword" style="position: relative; bottom: 20px">忘记密码</el-button>
+                </el-form-item>
               </div>
             </el-form>
             </div>
@@ -59,9 +63,9 @@ export default {
       encodedPsw:"",
       select:this.$route.query.select,
       loginCharacters:[
-        {label:"用户入口",value:"user"},
-        {label:"医生入口",value:"doctor"},
-        {label:"医疗机构入口",value:"hospital"}
+        {label:"用户入口",value:"users"},
+        {label:"医生入口",value:"doctors"},
+        {label:"医疗机构入口",value:"hospitals"}
       ],
       rules:{
         loginName: [
@@ -75,7 +79,7 @@ export default {
         ]
       },
       form:{
-        loginName:"",
+        loginName:this.$cookies.get('loginName'),
         loginPassword:""
       },
 
@@ -83,24 +87,40 @@ export default {
   },
   methods : {
     onSubmit(){
-      console.log(this.select)
-      this.encodedPsw = sha1(this.form.loginPassword)
-      if (this.select === 'user'){
-          axios.get("http://localhost/users/"+this.form.loginName+"/"+this.encodedPsw).then(res =>{
-            console.log(res)
-            if (res.data === 'login success'){
-              window.localStorage.setItem("loginState",this.form.loginName)
-              window.localStorage.setItem("loginRole",this.select)
-              ElMessage({
-                message: '登录成功，即将前往首页',
-                type: 'success',
-              })
-              setTimeout(() =>{
-                window.location.href = 'http://localhost:8080/'
-              },1500)
-            }
-          })
+      this.$refs.form.validate(valid =>{
+        if (valid){
+          this.encodedPsw = sha1(this.form.loginPassword)
+          if (this.select === 'users'){
+            axios.get("http://localhost/"+this.select+"/"+this.form.loginName+"/"+this.encodedPsw).then(res =>{
+              console.log(res)
+              if (res.data === 'login success'){
+                window.localStorage.setItem("loginState",this.form.loginName)
+                window.localStorage.setItem("loginRole",this.select)
+                if (!this.$cookies.isKey('loginName') || this.$cookies.get('loginName') !== this.form.loginName){
+                  this.$cookies.set('loginName',this.form.loginName)
+                  console.log("cookie setting")
+                }
+
+                ElMessage({
+                  message: '登录成功，即将前往首页',
+                  type: 'success',
+                })
+                setTimeout(() =>{
+                  window.location.href = 'http://localhost:8080/'
+                },1500)
+              }
+              else if (res.data === 'login name or password error'){
+                ElMessage.error("用户名或密码错误")
+              }
+              else
+                ElMessage.error("系统繁忙，请稍后再试")
+            })
+          }
         }
+      })
+    },
+    modifyPassword(){
+      this.$router.push({path: '/resetPassword',query:{role:this.select}})
     }
   }
 }

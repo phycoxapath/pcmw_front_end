@@ -37,17 +37,26 @@ const routes = [
     children:[
       {
         path:'personalInfo',
-        component: () => import('../components/PersonalInfo')
+        component: () => import('../components/PersonalCenterComponents/PersonalInfo')
       },
       {
         path: 'infoEdit',
-        component: () => import('../components/InfoEdit')
+        component: () => import('../components/PersonalCenterComponents/InfoEdit')
       },
       {
         path: 'userQualification',
-        component: () => import('../components/UserQualification')
+        component: () => import('../components/PersonalCenterComponents/UserQualification')
+      },
+      {
+        path: 'modifyPassword',
+        component: () => import('../components/PersonalCenterComponents/ModifyPassword')
       }
     ]
+  },
+  {
+    path: '/resetPassword',
+    name: 'resetPassword',
+    component: () => import('../views/ResetPassword')
   }
 
 ]

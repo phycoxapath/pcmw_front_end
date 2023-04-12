@@ -30,6 +30,7 @@
 <script>
 import axios from "axios";
 import {Edit} from "@element-plus/icons-vue";
+import {ElMessage} from "element-plus";
 
 
 export default {
@@ -55,6 +56,7 @@ export default {
         资质类型:"",
       },
       user:{
+        id:"",
         loginName:"",
         gender:"",
         age:0,
@@ -88,38 +90,40 @@ export default {
         this.userData.收货地址 = newValue
         this.user.address = newValue
       }
-      axios.put("http://localhost/users",this.user)
+      this.user.id = window.localStorage.getItem('id')
+      axios.put("http://localhost/users",this.user).then(res =>{
+        if (res.data === 'update success'){
+          ElMessage.success("保存成功")
+        }
+      })
       this.lineIndex = ""
     }
   },
   mounted() {
     this.user.loginName = window.localStorage.getItem('loginState')
-    if (window.localStorage.getItem('loginRole') === 'user'){
-      axios.get("http://localhost/users/"+window.localStorage.getItem('loginState')).then(res =>{
-        console.log(res.data)
-        let i = 0,j = 0;
-        for (const resKey in res.data) {
-          if (resKey === 'password') {
-            continue;
-          }
-          i++;
-          for (const userKey in this.userData) {
-            j++;
-            if (i === j){
-              this.userData[userKey] = res.data[resKey];
-              j = 0
-              break;
-            }
+    axios.get("http://localhost/"+window.localStorage.getItem('loginRole')+"/"+window.localStorage.getItem('loginState')).then(res =>{
+      let i = 0,j = 0;
+      for (const resKey in res.data) {
+        if (resKey === 'password') {
+          continue;
+        }
+        i++;
+        for (const userKey in this.userData) {
+          j++;
+          if (i === j){
+            this.userData[userKey] = res.data[resKey];
+            j = 0
+            break;
           }
         }
-      })
-    }
-    else if (window.localStorage.getItem('loginRole') === 'doctor'){
-
-    }
-    else if (window.localStorage.getItem('loginRole') === 'hospital'){
-
-    }
+      }
+      for (const userDataKey in this.userData) {
+        if (this.userData[userDataKey] === "" || this.userData[userDataKey] === null){
+          this.infoCompletion = true;
+          break;
+        }
+      }
+    })
   }
 }
 </script>

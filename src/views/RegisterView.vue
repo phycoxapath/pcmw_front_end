@@ -1,7 +1,9 @@
 <template>
 <div>
+  <el-text class="mx-1" size="large" style="font-size: 30px;position: relative;left: 720px;top: 30px">注 册</el-text>
   <el-form :model="registerForm" label-width="120px" class="demo-border"
   :rules="rules"
+   ref="registerForm"
   >
     <div >
       <el-form-item>
@@ -105,61 +107,62 @@ export default {
   },
   methods:{
     onSubmit(){
-      this.user.loginName=this.registerForm.registerName
-      this.user.jobId=this.registerForm.registerName
-      this.user.hospitalName=this.registerForm.registerName
-      this.user.password=sha1(this.registerForm.registerPassword)
-      this.user.qualification=this.registerForm.qualification
-      if (this.radio === '用户注册'){
-        this.user.qualType = "免挂号绿色通道预约资质"
-        axios.post("http://localhost/users",this.user).then(res =>{
-          console.log(res)
-          if (res.data === 'register success'){
-            ElMessage({
-              message: '注册成功，即将前往登录页面',
-              type: 'success',
+      this.$refs.registerForm.validate((isValid, invalidFields) => {
+        if (isValid){
+          this.user.loginName=this.registerForm.registerName
+          this.user.jobId=this.registerForm.registerName
+          this.user.hospitalName=this.registerForm.registerName
+          this.user.password=sha1(this.registerForm.registerPassword)
+          this.user.qualification=this.registerForm.qualification
+          if (this.radio === '用户注册'){
+            this.user.qualType = "免挂号绿色通道预约资质"
+            axios.post("http://localhost/users",this.user).then(res =>{
+              console.log(res)
+              if (res.data === 'register success'){
+                ElMessage({
+                  message: '注册成功，即将前往登录页面',
+                  type: 'success',
+                })
+                setTimeout(()=>{
+                  this.$router.push({path: '/login', query:{select:'users'}})
+                },1500)
+              }
             })
-            setTimeout(()=>{
-              this.$router.push({path: '/login', query:{select:'user'}})
-            },1500)
-
           }
+          else if(this.radio === '医生注册'){
+            this.user.qualType = "从业资格证明"
+            axios.post("http://localhost/doctors",this.user).then(res =>{
+              console.log(res)
+              if (res.data === 'register success'){
+                ElMessage({
+                  message: '注册成功，即将前往登录页面',
+                  type: 'success',
+                })
+                setTimeout(()=>{
+                  this.$router.push({path: '/login', query:{select:'doctors'}})
+                },1500)
 
-        })
-      }
-      else if(this.radio === '医生注册'){
-        this.user.qualType = "从业资格证明"
-        axios.post("http://localhost/doctors",this.user).then(res =>{
-          console.log(res)
-          if (res.data === 'register success'){
-            ElMessage({
-              message: '注册成功，即将前往登录页面',
-              type: 'success',
+              }
             })
-            setTimeout(()=>{
-              this.$router.push({path: '/login', query:{select:'医生入口'}})
-            },1500)
-
           }
-        })
-      }
-      else{
-        this.user.qualType = "机构资质证明"
-        axios.post("http://localhost/hospitals",this.user).then(res =>{
-          console.log(res)
-          if (res.data === 'register success'){
-            ElMessage({
-              message: '注册成功，即将前往登录页面',
-              type: 'success',
+          else{
+            this.user.qualType = "机构资质证明"
+            axios.post("http://localhost/hospitals",this.user).then(res =>{
+              console.log(res)
+              if (res.data === 'register success'){
+                ElMessage({
+                  message: '注册成功，即将前往登录页面',
+                  type: 'success',
+                })
+                setTimeout(()=>{
+                  this.$router.push({path: '/login', query:{select:'hospitals'}})
+                },1500)
+
+              }
             })
-            setTimeout(()=>{
-              this.$router.push({path: '/login', query:{select:'机构入口'}})
-            },1500)
-
           }
-        })
-      }
-
+        }
+      })
     },
     onClick(){
       setTimeout(()=>{

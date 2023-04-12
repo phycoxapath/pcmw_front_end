@@ -42,11 +42,10 @@ export default {
         if (window.localStorage.getItem('loginState')) {
           window.localStorage.removeItem('loginState')
           window.localStorage.removeItem('loginRole')
+          window.localStorage.removeItem('id')
           window.location.href = "http://localhost:8080/"
         }
-        if (key === 'personalCenter'){
-          this.$route.push('/personalCenter')
-        }
+
       }
     }
   },
