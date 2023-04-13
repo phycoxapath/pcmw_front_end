@@ -36,6 +36,22 @@
 <!--&lt;!&ndash;        <el-button type="primary" @click="onSubmit">登录</el-button>&ndash;&gt;-->
 <!--&lt;!&ndash;      </el-form-item>&ndash;&gt;-->
 <!--  </el-form>-->
+  <el-dialog
+      v-model="loginPrompt"
+      title=""
+      width="30%"
+      align-center
+      :before-close="closeRedirect"
+  >
+    <span>您还未登录，请先登录!</span>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button type="primary" @click="onCLick">
+          确定
+        </el-button>
+      </span>
+    </template>
+  </el-dialog>
   <el-menu
       active-text-color="#337ecc"
       default-active="1"
@@ -50,7 +66,7 @@
       <el-icon><Stamp /></el-icon>
       <span>个人信息</span>
     </el-menu-item>
-    <el-menu-item index="/personalCenter/infoEdit">
+    <el-menu-item :index=this.baseIndex+this.infoEditIndex>
       <el-icon><Edit /></el-icon>
       <span>完善资料</span>
     </el-menu-item>
@@ -76,6 +92,9 @@ export default {
   },
   data(){
     return{
+      baseIndex:"/personalCenter/",
+      infoEditIndex:"",
+      loginPrompt:false,
       alertShow:true,
       personalInfoShow:false,
       infoEditShow:false,
@@ -92,13 +111,33 @@ export default {
     selectHandle(key){
 
     },
+    onCLick(){
+      this.$router.push('/login')
+    },
+    closeRedirect(done){
+      this.$router.push('/login')
+    }
 
   },
   mounted() {
     this.loginState = window.localStorage.getItem('loginState')
-    axios.get("http://localhost/"+window.localStorage.getItem('loginRole')+"/"+this.loginState).then(res =>{
-      window.localStorage.setItem('id',res.data.id)
-    })
+    this.loginPrompt = !window.localStorage.getItem('loginState')
+    if(this.loginState) {
+      switch (window.localStorage.getItem('loginRole')){
+        case 'users':
+              this.infoEditIndex = 'infoEdit'
+              break
+        case 'hospitals':
+              this.infoEditIndex = 'hospitalInfoEdit'
+              break
+        case 'doctors':
+
+              break
+      }
+      axios.get("http://localhost/" + window.localStorage.getItem('loginRole') + "/" + this.loginState).then(res => {
+        window.localStorage.setItem('id', res.data.id)
+      })
+    }
   }
 }
 </script>

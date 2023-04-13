@@ -44,6 +44,10 @@ const routes = [
         component: () => import('../components/PersonalCenterComponents/InfoEdit')
       },
       {
+        path: 'hospitalInfoEdit',
+        component: () => import('../components/PersonalCenterComponents/HospitalInfoEdit')
+      },
+      {
         path: 'userQualification',
         component: () => import('../components/PersonalCenterComponents/UserQualification')
       },

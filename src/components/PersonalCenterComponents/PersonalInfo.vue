@@ -11,7 +11,7 @@
       border
 
   >
-   <el-descriptions-item width="300"  v-for="(attr,index) in userData" :key="index">
+   <el-descriptions-item width="300"  v-for="(attr,index) in showData" :key="index">
      <template #label>
          {{index}}
      </template>
@@ -19,6 +19,14 @@
    </el-descriptions-item>
 
   </el-descriptions>
+  <div v-show="loginRole === 'hospitals'">
+    <el-text size="large" style="position: absolute; left: 550px;top: 460px">下属科室：</el-text>
+      <el-table :data="dept" height="250" stripe style="width: 39%;position:absolute;left: 550px;top: 480px;background-color: #FAFAFA" >
+        <el-table-column prop="hospName" label="机构名" width="250" />
+        <el-table-column prop="deptName" label="科室名" width="250" />
+      </el-table>
+
+  </div>
 
 </template>
 
@@ -28,12 +36,13 @@ export default {
   name: "PersonalInfo",
   data(){
     return{
-      infoCompletion:false,
       loginRole:"",
-      loginState:"",
-      formInline:{
-        user:"",
-        region:""
+      infoCompletion:false,
+      dept:[
+
+      ],
+      showData: {
+
       },
       userData:{
         id:"",
@@ -44,7 +53,13 @@ export default {
         是否取得资质:"",
         资质类型:"",
       },
-      userData1:{
+      hospitalData:{
+        id:"",
+        医院名称:"",
+        是否取得资质:"",
+        资质类型:""
+      },
+      doctorData:{
 
       }
     }
@@ -53,32 +68,54 @@ export default {
 
   },
   mounted() {
-
-
+        this.loginRole = window.localStorage.getItem('loginRole')
+        if (window.localStorage.getItem('loginRole') === 'hospitals'){
+          axios.get("http://localhost/hospitals/getById/"+window.localStorage.getItem('id')).then(res=>{
+            for (let i = 0; i < res.data.departments.length; i++) {
+              this.dept.push({
+                hospName:window.localStorage.getItem('loginState'),
+                deptName:res.data.departments[i].deptName
+              })
+            }
+          })
+        }
         axios.get("http://localhost/"+window.localStorage.getItem('loginRole')+"/"+window.localStorage.getItem('loginState')).then(res =>{
-
+          //根据loginRole选择要展示的数据框架
+          switch (window.localStorage.getItem('loginRole')){
+            case 'users':
+              this.showData = this.userData
+                  break
+            case 'hospitals':
+              this.showData = this.hospitalData
+                  break
+            case 'doctors':
+              break
+          }
           let i = 0,j = 0;
+          //跳过展示密码，并将其他属性对齐
           for (const resKey in res.data) {
             if (resKey === 'password') {
               continue;
             }
             i++;
-            for (const userKey in this.userData) {
+            for (const userKey in this.showData) {
               j++;
               if (i === j){
-                this.userData[userKey] = res.data[resKey];
+                this.showData[userKey] = res.data[resKey];
                 j = 0
                 break;
               }
             }
           }
-          for (const userDataKey in this.userData) {
-            if (this.userData[userDataKey] === "" || this.userData[userDataKey] === null){
+          //userData中还有空值就显示提醒框el-alert
+          for (const userDataKey in this.showData) {
+            if (this.showData[userDataKey] === "" || this.showData[userDataKey] === null){
               this.infoCompletion = true;
               break;
             }
           }
         })
+
 
   }
 
@@ -95,5 +132,18 @@ export default {
   position: absolute;
   top: 80px;
   left: 550px;
+}
+.scrollbar-demo-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  width: 400px;
+  margin: 10px;
+  text-align: center;
+  border-radius: 4px;
+  background:  #c8c9cc;
+  color: #303133;
+  
 }
 </style>

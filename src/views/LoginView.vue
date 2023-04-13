@@ -86,14 +86,17 @@ export default {
     }
   },
   methods : {
+
     onSubmit(){
       this.$refs.form.validate(valid =>{
         if (valid){
           this.encodedPsw = sha1(this.form.loginPassword)
-          if (this.select === 'users'){
+
             axios.get("http://localhost/"+this.select+"/"+this.form.loginName+"/"+this.encodedPsw).then(res =>{
               console.log(res)
               if (res.data === 'login success'){
+                //loginState 判断登录状态，value为登录名
+                //loginRole 判断登录角色，目前三角色分别为users doctors hospitals，对应三个controller的RequestMapping
                 window.localStorage.setItem("loginState",this.form.loginName)
                 window.localStorage.setItem("loginRole",this.select)
                 if (!this.$cookies.isKey('loginName') || this.$cookies.get('loginName') !== this.form.loginName){
@@ -116,7 +119,7 @@ export default {
                 ElMessage.error("系统繁忙，请稍后再试")
             })
           }
-        }
+
       })
     },
     modifyPassword(){

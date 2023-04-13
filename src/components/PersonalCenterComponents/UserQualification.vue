@@ -51,7 +51,7 @@
       :drag="true"
   >
     <template #trigger>
-      <el-button type="primary">点击此处或拖拽文件上传</el-button>
+      <el-button type="primary"><el-icon><Upload /></el-icon>点击或拖拽文件到此处上传</el-button>
     </template>
     <template #tip>
       <div class="el-upload__tip">

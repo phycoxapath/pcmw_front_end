@@ -11,9 +11,9 @@
       <template #label>
         {{index}}
       </template>
+<!--      下面input的value即为动态渲染时的attr，也即userData对应key的value-->
       {{attr}}<el-input v-model="newValue" :value=attr v-if="index === lineIndex && index!=='性别'"></el-input>
-<!--      <el-input v-model="newAge" v-if="index ==='年龄'"></el-input>-->
-<!--      <el-input v-model="newAddr" v-if="index ==='收货地址'"></el-input>-->
+
       <el-radio-group v-if="index === '性别' &&index === lineIndex" v-model="newGender">
         <el-radio label="男" size="large">男</el-radio>
         <el-radio label="女" size="large">女</el-radio>
@@ -65,6 +65,7 @@ export default {
     }
   },
   methods :{
+    //lineIndex:所点击的行的index，即描述列表动态渲染时userData的key
     modify(type,input){
       this.lineIndex = type
 
@@ -72,6 +73,8 @@ export default {
     cancel(){
       this.lineIndex = ""
     },
+    //newValue双向绑定动态渲染出的所有行的输入框，但由于一次只修改一个属性，可以保证正常使用
+    //点击save时传进来的newValue即为输入框中的新值
     save(type,newValue){
       if (type === '用户名'){
         this.userData.用户名 = newValue
@@ -117,12 +120,7 @@ export default {
           }
         }
       }
-      for (const userDataKey in this.userData) {
-        if (this.userData[userDataKey] === "" || this.userData[userDataKey] === null){
-          this.infoCompletion = true;
-          break;
-        }
-      }
+
     })
   }
 }
