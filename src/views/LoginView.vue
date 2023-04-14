@@ -92,7 +92,7 @@ export default {
         if (valid){
           this.encodedPsw = sha1(this.form.loginPassword)
 
-            axios.get("http://localhost/"+this.select+"/"+this.form.loginName+"/"+this.encodedPsw).then(res =>{
+            axios.get("http://localhost/"+this.select+"/login?name="+this.form.loginName+"&password="+this.encodedPsw).then(res =>{
               console.log(res)
               if (res.data === 'login success'){
                 //loginState 判断登录状态，value为登录名

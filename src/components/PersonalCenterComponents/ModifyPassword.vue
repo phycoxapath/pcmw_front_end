@@ -11,7 +11,7 @@
     </el-form-item>
     <br/><br/>
     <el-form-item label="请确认新密码:" v-show="oldPswCorrect === true" prop="confirmPassword">
-      <el-input type="password" v-model="oldPassword.confirmPassword" placeholder="确认新密码" />
+      <el-input type="password" v-model="oldPassword.confirmPassword" placeholder="确认新密码" show-password/>
     </el-form-item>
     <el-form-item v-show="oldPswCorrect === true">
       <el-button type="primary" @click="newPswSubmit">提交</el-button>
@@ -34,6 +34,7 @@ export default {
         callback();
     }
     return{
+      loginRole:"",
       oldPswCorrect:false,
       oldPassword:{
         password:"",
@@ -60,7 +61,8 @@ export default {
   },
   methods:{
     oldPswVerify(){
-      axios.get("http://localhost/"+window.localStorage.getItem('loginRole')+"/"+window.localStorage.getItem('loginState')+"/"+sha1(this.oldPassword.password)).then(res =>{
+      axios.get("http://localhost/"+window.localStorage.getItem('loginRole')+"/login?name="+window.localStorage.getItem('loginState')+"&password="+sha1(this.oldPassword.password)).then(res =>{
+        console.log(res)
         if (res.data === 'login success'){
           ElMessage.success("验证通过，请输入新密码")
           this.oldPswCorrect = true
@@ -78,11 +80,12 @@ export default {
           axios.put("http://localhost/"+window.localStorage.getItem('loginRole'),this.updatePassword).then(res =>{
             if (res.data === 'update success'){
               ElMessage.success("密码修改成功，即将跳转到登录页面，请重新登录")
+              this.loginRole = window.localStorage.getItem('loginRole')
               window.localStorage.removeItem('loginState')
               window.localStorage.removeItem('loginRole')
               window.localStorage.removeItem('id')
               setTimeout(() =>{
-                this.$router.push({path: '/login',query:{select : window.localStorage.getItem('loginRole')}})
+                this.$router.push({path: '/login',query:{select : this.loginRole}})
               },1500)
             }else if (res.data === 'update fail'){
               ElMessage.error("系统繁忙，请稍后再试！")

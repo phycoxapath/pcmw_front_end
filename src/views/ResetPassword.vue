@@ -41,7 +41,7 @@ export default {
     var loginNameQuery = (rule, value, callback) =>{
        this.queryName = this.role === 'users' ? this.modifyData.loginName : (this.role === 'doctors' ? this.modifyData.jobId : this.modifyData.hospitalName)
       console.log(this.queryName)
-      axios.get("http://localhost/" + this.role + "/" + this.queryName).then(res => {
+      axios.get("http://localhost/" + this.role + "/getByName?name=" + this.queryName).then(res => {
           if (res.data === null || res.data === "") {
             callback(new Error("用户不存在"));
             ElMessage.error("用户不存在！")

@@ -48,9 +48,14 @@ const routes = [
         component: () => import('../components/PersonalCenterComponents/HospitalInfoEdit')
       },
       {
+        path: 'doctorInfoEdit',
+        component: () => import('../components/PersonalCenterComponents/DoctorInfoEdit')
+      },
+      {
         path: 'userQualification',
         component: () => import('../components/PersonalCenterComponents/UserQualification')
       },
+
       {
         path: 'modifyPassword',
         component: () => import('../components/PersonalCenterComponents/ModifyPassword')

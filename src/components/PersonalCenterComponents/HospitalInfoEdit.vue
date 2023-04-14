@@ -27,12 +27,25 @@
           hasChecked: '${checked}/${total}',
         }"
                  filterable
-                 filter-placeholder="输入科室名搜索">
+                 filter-placeholder="输入科室名搜索"
+
+    >
       <template #right-footer>
         <el-button class="transfer-footer" color="#ecf5ff" size="large" @click="binding"><el-icon><Finished /></el-icon>绑定</el-button>
       </template>
       <template #left-footer>
-        <el-button class="transfer-footer" color="#ecf5ff" size="large" @click="diyDialog = true"><el-icon><Finished /></el-icon>新建自定义科室</el-button>
+        <el-button class="transfer-footer" color="#ecf5ff" size="large" @click="diyDialog = true"><el-icon><Finished /></el-icon>新建科室</el-button>
+      </template>
+      <template #default="{ option }">
+        <div v-if="option.label.endsWith(')')">
+          <el-tooltip  content="双击解绑" placement="left-start" effect="light">
+            <span @dblclick="deBind(option)">{{ option.label }}</span>
+          </el-tooltip>
+        </div>
+        <div v-else>
+          <span>{{ option.label }}</span>
+        </div>
+
       </template>
     </el-transfer>
   </div>
@@ -59,7 +72,7 @@ export default {
   name: "HospitalInfoEdit",
   data(){
     return{
-
+      id:"",
       diyDialog:false,
       newDeptName:"",
       bindingDept:[],
@@ -134,7 +147,7 @@ export default {
             ElMessage.success("绑定成功！")
             this.submitArray = []
             this.bindingDept = []
-            axios.get("http://localhost/hospitals/getById/"+window.localStorage.getItem('id')).then(res=>{
+            axios.get("http://localhost/hospitals/getById?id="+window.localStorage.getItem('id')).then(res=>{
               console.log(res.data)
               this.boundArray = res.data.departments
               for (let i = 0; i < this.boundArray.length; i++) {
@@ -165,10 +178,22 @@ export default {
         disabled: false
       })
       this.newDeptName = ""
+    },
+    deBind(option){
+      axios.delete("http://localhost/hospitals/deleteDept?deptName="+option.key+"&hospId="+this.id).then(res=>{
+        if (res.data === 'delete success'){
+          option.disabled = false
+          option.label = option.label.substring(0,option.label.lastIndexOf('('))
+        }
+        else
+          ElMessage.error("系统繁忙，请稍后再试！")
+      })
+
     }
   },
   mounted() {
-    axios.get("http://localhost/"+window.localStorage.getItem('loginRole')+"/"+window.localStorage.getItem('loginState')).then(res =>{
+    this.id = window.localStorage.getItem('id')
+    axios.get("http://localhost/"+window.localStorage.getItem('loginRole')+"/getByName?name="+window.localStorage.getItem('loginState')).then(res =>{
       let i = 0,j = 0;
       for (const resKey in res.data) {
         if (resKey === 'password') {
@@ -183,6 +208,8 @@ export default {
             break;
           }
         }
+        if (resKey === 'qualType')
+          break;
       }
       for (const userDataKey in this.hospitalData) {
         if (this.hospitalData[userDataKey] === "" || this.hospitalData[userDataKey] === null){
@@ -191,7 +218,7 @@ export default {
         }
       }
     })
-    axios.get("http://localhost/hospitals/getById/"+window.localStorage.getItem('id')).then(res=>{
+    axios.get("http://localhost/hospitals/getById?id="+window.localStorage.getItem('id')).then(res=>{
       this.boundArray = res.data.departments
       console.log(this.boundArray)
       for (let i = 0; i < this.boundArray.length; i++) {

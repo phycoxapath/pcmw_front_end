@@ -1,5 +1,10 @@
 <template>
-  <div class="text-one">
+  <div class="text-four" v-show="loginRole === 'hospitals'">
+    <el-text class="mx-1" size="large" style="font-size: 18px;">
+      请在下方上传能够证明机构从业资质的文件，您的机构经管理员审批通过后方可上线入驻
+    </el-text>
+  </div>
+  <div class="text-one" v-show="loginRole === 'users'">
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     <el-text class="mx-1" size="large" >
       在
@@ -18,7 +23,7 @@
       或以上的用户，可以申请免挂号绿色通道预约资质。
     </el-text>
   </div>
-  <div class="text-two">
+  <div class="text-two" v-show="loginRole === 'users'">
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     <el-text class="mx-1" size="large">
       拥有该资质您可以享受：
@@ -28,7 +33,7 @@
       ①免挂号快速预约；②（新冠爆发期时）优先受理预约以及优先分配病房；③（新冠爆发期时）可以呼叫救护车；
     </el-text>
   </div>
-  <div class="text-three">
+  <div class="text-three" v-show="loginRole === 'users'">
     <el-text class="mx-1" size="large">
       您可以在下方上传文件区域上传可以证明您基础疾病或年龄的文件(可以是医院检查报告图片、身份证出生日期的图片等)
     </el-text>
@@ -37,7 +42,7 @@
       v-model:file-list="fileList"
       ref="upload"
       class="upload-demo"
-      action="http://localhost/users/upload"
+      :action="requestURL"
       multiple
       :data="extraData"
       :on-success="handleSuccess"
@@ -45,13 +50,14 @@
       :on-remove="handleRemove"
       :before-remove="beforeRemove"
       :before-upload="beforeAvatarUpload"
-      :limit="3"
+      :limit="1"
       :on-exceed="handleExceed"
       :auto-upload="false"
       :drag="true"
+      :disabled="fileList.length !== 0"
   >
     <template #trigger>
-      <el-button type="primary"><el-icon><Upload /></el-icon>点击或拖拽文件到此处上传</el-button>
+      <el-button type="primary" @click="isUpload"><el-icon><Upload /></el-icon>点击或拖拽文件到此处上传</el-button>
     </template>
     <template #tip>
       <div class="el-upload__tip">
@@ -64,16 +70,19 @@
 
 <script>
 import {ElMessage} from "element-plus";
+import axios from "axios";
 
 export default {
   name: "userQualification",
   data(){
     return{
+      loginRole:"",
+      requestURL:"",
       fileList:[
 
       ],
       extraData:{
-        loginName:""
+        id:""
       }
     }
   },
@@ -105,11 +114,24 @@ export default {
     uploadFile(){
       this.$refs.upload.submit()
     },
-
+    isUpload(){
+      if (this.fileList.length !== 0){
+        ElMessage.warning("您已经上传过认证文件了！文件正在审核中，请勿重复上传！")
+      }
+    }
   },
 
   mounted() {
-    this.extraData.loginName = window.localStorage.getItem('loginState')
+    this.extraData.id = window.localStorage.getItem('id')
+    this.loginRole = window.localStorage.getItem('loginRole')
+    this.requestURL = "http://localhost/"+this.loginRole+"/upload"
+    axios.get("http://localhost/"+this.loginRole+"/getById?id="+this.extraData.id).then(res=>{
+      console.log(res.data)
+      this.fileList.push({
+        name:res.data.qualImage,
+        url:""
+      })
+    })
   }
 }
 </script>
@@ -134,6 +156,11 @@ export default {
   position: absolute;
   top: 320px;
   left: 380px;
+}
+.text-four{
+  position: absolute;
+  top: 40%;
+  left: 35%;
 }
 .mx-1{
   font-size: 18px;

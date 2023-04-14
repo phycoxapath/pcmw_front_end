@@ -104,7 +104,7 @@ export default {
   },
   mounted() {
     this.user.loginName = window.localStorage.getItem('loginState')
-    axios.get("http://localhost/"+window.localStorage.getItem('loginRole')+"/"+window.localStorage.getItem('loginState')).then(res =>{
+    axios.get("http://localhost/"+window.localStorage.getItem('loginRole')+"/getById?id="+window.localStorage.getItem('id')).then(res =>{
       let i = 0,j = 0;
       for (const resKey in res.data) {
         if (resKey === 'password') {

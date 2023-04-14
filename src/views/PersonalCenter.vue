@@ -1,41 +1,7 @@
 <template>
-<!--  <div v-show="personalInfoShow">-->
-<!--    <el-alert v-show="alertShow" style="width: 600px" :closable="false" title="您的个人资料尚未完善，请通过左侧导航栏<完善资料>完善个人资料" type="warning" show-icon class="alert-info"/>-->
-<!--  </div>-->
-<!--  <div v-show="infoEditShow">-->
-<!--    <info-edit class="info-edit"/>-->
-<!--  </div>-->
 <router-view/>
 <div>
-<!--  <el-form :model="updateData" label-width="120px" class="demo-border"-->
-<!--           :rules="rules"-->
-<!--  >-->
-<!--&lt;!&ndash;    <el-select v-model="select" class="m-2" placeholder="请先选择登录入口" size="large" style="position: relative;left: 180px">&ndash;&gt;-->
-<!--&lt;!&ndash;      <el-option&ndash;&gt;-->
-<!--&lt;!&ndash;          v-for="item in loginCharacters"&ndash;&gt;-->
-<!--&lt;!&ndash;          :key="item.value"&ndash;&gt;-->
-<!--&lt;!&ndash;          :label="item.label"&ndash;&gt;-->
-<!--&lt;!&ndash;          :value="item.value"&ndash;&gt;-->
-<!--&lt;!&ndash;      />&ndash;&gt;-->
-<!--&lt;!&ndash;    </el-select>&ndash;&gt;-->
-<!--&lt;!&ndash;    <el-row :gutter="20">&ndash;&gt;-->
-<!--&lt;!&ndash;      <el-col :span="6"><div class="grid-content ep-bg-purple" /></el-col>&ndash;&gt;-->
-<!--&lt;!&ndash;      <el-col :span="6"><div class="grid-content ep-bg-purple" /></el-col>&ndash;&gt;-->
-<!--&lt;!&ndash;      <el-col :span="6"><div class="grid-content ep-bg-purple" /></el-col>&ndash;&gt;-->
-<!--&lt;!&ndash;      <el-col :span="6"><div class="grid-content ep-bg-purple" /></el-col>&ndash;&gt;-->
-<!--&lt;!&ndash;    </el-row>&ndash;&gt;-->
-<!--&lt;!&ndash;      <el-form-item class="input-style" label="密码" prop="loginPassword">&ndash;&gt;-->
-<!--&lt;!&ndash;        <el-input type="password" v-model="form.loginPassword" show-password placeholder="输入密码"/>&ndash;&gt;-->
-<!--&lt;!&ndash;      </el-form-item>&ndash;&gt;-->
-<!--      &lt;!&ndash;                <el-form-item class="text-style">&ndash;&gt;-->
-<!--      &lt;!&ndash;                  <el-text type="primary">&ndash;&gt;-->
-<!--      &lt;!&ndash;                    没有账号？<el-button type="primary" plain>注册一个</el-button>&ndash;&gt;-->
-<!--      &lt;!&ndash;                  </el-text>&ndash;&gt;-->
-<!--      &lt;!&ndash;                </el-form-item>&ndash;&gt;-->
-<!--&lt;!&ndash;      <el-form-item class="button-style">&ndash;&gt;-->
-<!--&lt;!&ndash;        <el-button type="primary" @click="onSubmit">登录</el-button>&ndash;&gt;-->
-<!--&lt;!&ndash;      </el-form-item>&ndash;&gt;-->
-<!--  </el-form>-->
+
   <el-dialog
       v-model="loginPrompt"
       title=""
@@ -70,7 +36,7 @@
       <el-icon><Edit /></el-icon>
       <span>完善资料</span>
     </el-menu-item>
-    <el-menu-item index="/personalCenter/userQualification">
+    <el-menu-item :index=this.baseIndex+this.qualificationIndex>
       <el-icon><CircleCheckFilled /></el-icon>
       <span>资质认证</span>
     </el-menu-item>
@@ -93,6 +59,8 @@ export default {
   data(){
     return{
       baseIndex:"/personalCenter/",
+      infoShowIndex:"",
+      qualificationIndex:"",
       infoEditIndex:"",
       loginPrompt:false,
       alertShow:true,
@@ -126,15 +94,18 @@ export default {
       switch (window.localStorage.getItem('loginRole')){
         case 'users':
               this.infoEditIndex = 'infoEdit'
+              this.infoShowIndex = 'personalInfo'
               break
         case 'hospitals':
               this.infoEditIndex = 'hospitalInfoEdit'
+              this.infoShowIndex = 'personalInfo'
               break
         case 'doctors':
-
+              this.infoShowIndex = 'doctorInfo'
+              this.infoEditIndex = 'doctorInfoEdit'
               break
       }
-      axios.get("http://localhost/" + window.localStorage.getItem('loginRole') + "/" + this.loginState).then(res => {
+      axios.get("http://localhost/" + window.localStorage.getItem('loginRole') + "/getByName?name="+window.localStorage.getItem('loginState')).then(res => {
         window.localStorage.setItem('id', res.data.id)
       })
     }
