@@ -44,6 +44,10 @@
       <el-icon><EditPen /></el-icon>
       <span>修改密码</span>
     </el-menu-item>
+    <el-menu-item v-show="loginRole === 'hospitals'" index="/personalCenter/modifyPassword">
+      <el-icon><DocumentChecked /></el-icon>
+      <span>资质审核</span>
+    </el-menu-item>
 
   </el-menu>
 </div>
@@ -67,6 +71,7 @@ export default {
       personalInfoShow:false,
       infoEditShow:false,
       loginState:"",
+      loginRole:"",
       updateData:{
 
       },
@@ -89,20 +94,24 @@ export default {
   },
   mounted() {
     this.loginState = window.localStorage.getItem('loginState')
+    this.loginRole = window.localStorage.getItem('loginRole')
     this.loginPrompt = !window.localStorage.getItem('loginState')
     if(this.loginState) {
       switch (window.localStorage.getItem('loginRole')){
         case 'users':
               this.infoEditIndex = 'infoEdit'
               this.infoShowIndex = 'personalInfo'
+              this.qualificationIndex = 'userQualification'
               break
         case 'hospitals':
               this.infoEditIndex = 'hospitalInfoEdit'
               this.infoShowIndex = 'personalInfo'
+              this.qualificationIndex = 'userQualification'
               break
         case 'doctors':
               this.infoShowIndex = 'doctorInfo'
               this.infoEditIndex = 'doctorInfoEdit'
+              this.qualificationIndex = 'userQualification'
               break
       }
       axios.get("http://localhost/" + window.localStorage.getItem('loginRole') + "/getByName?name="+window.localStorage.getItem('loginState')).then(res => {

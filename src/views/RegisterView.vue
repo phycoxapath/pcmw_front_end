@@ -86,7 +86,18 @@ export default {
         qualification:false,
         qualType:""
       },
-
+      doctor:{
+        jobId:"",
+        password:"",
+        qualification:false,
+        qualType:""
+      },
+      hospital:{
+        hospitalName: "",
+        password:"",
+        qualification:false,
+        qualType:""
+      },
       rules:{
         registerName:[
           { required: true, message: '用户名不能为空！', trigger: 'blur' },

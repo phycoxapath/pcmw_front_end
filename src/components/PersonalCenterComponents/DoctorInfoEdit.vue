@@ -23,21 +23,86 @@
     </el-descriptions-item>
   </el-descriptions>
   <div class="deptSelector">
-    <p>请选择并绑定您的科室</p>
-    <el-cascader v-model="department" :options="deptProps"  />
+    <p>请选择并选择您的科室</p>
+    <el-cascader v-model="department" :options="deptProps"  />&nbsp;
     <el-button type="primary" color=" #ecf5ff" @click="deptSave">保存</el-button>
   </div>
+
   <div>
-    <el-table :header-cell-style="{background:'#F5F7FA'}" :data="weeks" height="100" stripe border style="width: 39%;position:absolute;left: 550px;top: 480px;background-color: #FAFAFA"
-    :row-style="{height:80}"
+    <p style="position:absolute; left: 60%;top: 48%">请选择您的工作日(单击选择/取消) <el-button type="primary" color=" #ecf5ff" @click="workingDaySave">保存</el-button></p>
+    <el-table :header-cell-style="{background:'#F5F7FA',textAlign:'center'}" :data="weeks" height="88" stripe border style="width: 561px;position:absolute;left: 60%;top: 54%;background-color: #FAFAFA"
+    :row-style="{height:80}" :cell-class-name="tableCellClassName" @cell-click="clickHandler"
     >
-      <el-table-column prop="Mon" label="星期一" width="80" />
-      <el-table-column prop="Tues" label="星期二" width="80" />
-      <el-table-column prop="Wed" label="星期三" width="80" />
-      <el-table-column prop="Thur" label="星期四" width="80" />
-      <el-table-column prop="Fri" label="星期五" width="80" />
-      <el-table-column prop="Sat" label="星期六" width="80" />
-      <el-table-column prop="Sun" label="星期日" width="80" />
+      <el-table-column prop="1" label="星期一" width="80" >
+        <template #default="scope">
+          <div style="display: flex; align-items: center" v-show="weekShow[scope.column.property]">
+            <el-tooltip  content="单击选择/取消" placement="bottom-end" effect="light">
+              <el-icon size="30px" color="#95d475" style="position: relative;left: 28%"><Select /></el-icon>
+            </el-tooltip>
+          </div>
+        </template>
+      </el-table-column>
+
+      <el-table-column prop="2" label="星期二" width="80" >
+        <template #default="scope">
+          <div style="display: flex; align-items: center" v-show="weekShow[scope.column.property]">
+            <el-tooltip  content="单击选择/取消" placement="bottom-end" effect="light">
+              <el-icon size="30px" color="#95d475" style="position: relative;left: 28%"><Select /></el-icon>
+            </el-tooltip>
+
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="3" label="星期三" width="80" >
+        <template #default="scope">
+          <div style="display: flex; align-items: center" v-show="weekShow[scope.column.property]">
+            <el-tooltip  content="单击选择/取消" placement="bottom-end" effect="light">
+              <el-icon size="30px" color="#95d475" style="position: relative;left: 28%"><Select /></el-icon>
+            </el-tooltip>
+
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="4" label="星期四" width="80" >
+        <template #default="scope">
+          <div style="display: flex; align-items: center" v-show="weekShow[scope.column.property]">
+            <el-tooltip  content="单击选择/取消" placement="bottom-end" effect="light">
+              <el-icon size="30px" color="#95d475" style="position: relative;left: 28%"><Select /></el-icon>
+            </el-tooltip>
+
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="5" label="星期五" width="80" >
+        <template #default="scope">
+          <div style="display: flex; align-items: center" v-show="weekShow[scope.column.property]">
+            <el-tooltip  content="单击选择/取消" placement="bottom-end" effect="light">
+              <el-icon size="30px" color="#95d475" style="position: relative;left: 28%"><Select /></el-icon>
+            </el-tooltip>
+
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="6" label="星期六" width="80" >
+        <template #default="scope">
+          <div style="display: flex; align-items: center" v-show="weekShow[scope.column.property]">
+            <el-tooltip  content="单击选择/取消" placement="bottom-end" effect="light">
+              <el-icon size="30px" color="#95d475" style="position: relative;left: 28%"><Select /></el-icon>
+            </el-tooltip>
+
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="7" label="星期日" width="80" >
+        <template #default="scope">
+          <div style="display: flex; align-items: center" v-show="weekShow[scope.column.property]">
+            <el-tooltip  content="单击选择/取消" placement="bottom-end" effect="light">
+              <el-icon size="30px" color="#95d475" style="position: relative;left: 28%"><Select /></el-icon>
+            </el-tooltip>
+
+          </div>
+        </template>
+      </el-table-column>
 
     </el-table>
   </div>
@@ -54,7 +119,8 @@ export default {
     return{
       department:[],
       deptProps:[],
-      weeks:[{Mon:"1"}],
+      weeks:[""],
+      weekShow:["",false,false,false,false,false,false,false],
       newGender:"",
       lineIndex:"",
       newValue:"",
@@ -124,9 +190,45 @@ export default {
           ElMessage.error("系统繁忙，保存失败，请稍后再试！")
       })
 
+    },
+    tableCellClassName({row, column, rowIndex, columnIndex}){
+
+    },
+    clickHandler(row, column, cell, event){
+      if (!this.weekShow[column.property]){
+        this.weekShow[column.property] = true
+        this.docSubmitData.workingDay |= 2**(7-column.property)
+        console.log(this.docSubmitData.workingDay.toString(2))
+        return
+      }
+      if (this.weekShow[column.property]){
+        this.weekShow[column.property] = false
+        this.docSubmitData.workingDay &= ~(2**(7-column.property))
+        console.log(this.docSubmitData.workingDay.toString(2))
+        return;
+      }
+    },
+    workingDaySave(){
+      if (this.docSubmitData.workingDay === 0){
+        ElMessage.error("你总得上一天班吧？")
+      }else {
+        axios.put("http://localhost/doctors",this.docSubmitData).then(res=>{
+          if (res.data === 'update success'){
+            ElMessage.success("保存成功")
+
+          }else if (res.data === 'update fail'){
+            ElMessage.error("系统繁忙，保存失败，请稍后再试！")
+          }else
+            ElMessage.error("系统繁忙，保存失败，请稍后再试！")
+        })
+
+      }
     }
+
+
   },
   mounted() {
+    this.docSubmitData.id = window.localStorage.getItem('id')
     axios.get("http://localhost/doctors/getById?id="+window.localStorage.getItem('id')).then(res=>{
       let i = 0,j = 0;
       //跳过展示密码，并将其他属性对齐
@@ -138,6 +240,13 @@ export default {
           continue;
         }
         if (resKey === 'workingDay') {
+          this.docSubmitData.workingDay = res.data[resKey]
+          let i = 64 ,j=1;
+          while (i > 0){
+            this.weekShow[j] = (i & res.data[resKey]) > 0
+            j++;
+            i = i/2;
+          }
           continue;
         }
         i++;

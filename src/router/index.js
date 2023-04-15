@@ -59,7 +59,13 @@ const routes = [
       {
         path: 'modifyPassword',
         component: () => import('../components/PersonalCenterComponents/ModifyPassword')
-      }
+      },
+      
+      {
+        path: 'hospitalQualHandle',
+        component: () => import('../components/PersonalCenterComponents/HospitalQualHandle')
+      },
+
     ]
   },
   {

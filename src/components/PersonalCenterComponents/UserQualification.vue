@@ -1,7 +1,12 @@
 <template>
   <div class="text-four" v-show="loginRole === 'hospitals'">
     <el-text class="mx-1" size="large" style="font-size: 18px;">
-      请在下方上传能够证明机构从业资质的文件，您的机构经管理员审批通过后方可上线入驻
+      请在下方上传能够证明机构资质的文件，您的机构经管理员审批通过后方可上线入驻
+    </el-text>
+  </div>
+  <div class="text-five" v-show="loginRole === 'doctors'">
+    <el-text class="mx-1" size="large" style="font-size: 18px;">
+      请在下方上传能够证明您在医院从业的文件，经院方审批通过后您即可受理预约和线上问诊
     </el-text>
   </div>
   <div class="text-one" v-show="loginRole === 'users'">
@@ -83,7 +88,13 @@ export default {
       ],
       extraData:{
         id:""
-      }
+      },
+      applyData:{
+        applicationType:"",
+        userId:"",
+        docId:"",
+        hospId:"",
+      },
     }
   },
   methods:{
@@ -113,6 +124,11 @@ export default {
     },
     uploadFile(){
       this.$refs.upload.submit()
+      axios.post("http://localhost/users/insertApply",this.applyData).then(res=>{
+        if (res.data === 'insert fail'){
+          ElMessage.error("系统繁忙，请稍后再试！")
+        }
+      })
     },
     isUpload(){
       if (this.fileList.length !== 0){
@@ -126,12 +142,26 @@ export default {
     this.loginRole = window.localStorage.getItem('loginRole')
     this.requestURL = "http://localhost/"+this.loginRole+"/upload"
     axios.get("http://localhost/"+this.loginRole+"/getById?id="+this.extraData.id).then(res=>{
-      console.log(res.data)
-      this.fileList.push({
-        name:res.data.qualImage,
-        url:""
-      })
+      if (res.data.qualImage !== null && res.data.qualImage !== '') {
+        console.log(res.data)
+        this.fileList.push({
+          name: res.data.qualImage,
+          url: ""
+        })
+      }
+      if (this.loginRole === 'doctors'){
+        this.applyData.hospId = res.data.hospId
+        this.applyData.applicationType = '从业资格认证申请'
+        this.applyData.docId = this.extraData.id
+      }else if (this.loginRole === 'users'){
+        this.applyData.applicationType = '免挂号绿色通道预约资质申请'
+        this.applyData.userId = this.extraData.id
+      }else if (this.loginRole === 'hospitals'){
+        this.applyData.applicationType = '机构资质认证申请'
+        this.applyData.hospId = this.extraData.id
+      }
     })
+
   }
 }
 </script>
@@ -158,6 +188,11 @@ export default {
   left: 380px;
 }
 .text-four{
+  position: absolute;
+  top: 40%;
+  left: 35%;
+}
+.text-five{
   position: absolute;
   top: 40%;
   left: 35%;

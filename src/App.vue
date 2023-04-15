@@ -18,8 +18,8 @@
   <el-menu-item index="/register" style="color: #409EFF;" v-show="!loginState">注册</el-menu-item>
   <el-sub-menu index="userConfig" style="color: #409EFF" v-show="loginState">
     <template #title>您好，{{ loginState }}</template>
-    <el-menu-item index="/personalCenter">个人中心</el-menu-item>
-    <el-menu-item index="exitLogin">退出登录</el-menu-item>
+    <el-menu-item index="/personalCenter"><el-icon><User /></el-icon> 个人中心</el-menu-item>
+    <el-menu-item index="exitLogin"><el-icon><CloseBold /></el-icon> 退出登录</el-menu-item>
   </el-sub-menu>
 
 </el-menu>
