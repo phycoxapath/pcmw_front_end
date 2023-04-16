@@ -44,7 +44,7 @@
       <el-icon><EditPen /></el-icon>
       <span>修改密码</span>
     </el-menu-item>
-    <el-menu-item v-show="loginRole === 'hospitals'" index="/personalCenter/modifyPassword">
+    <el-menu-item v-show="loginRole === 'hospitals'" index="/personalCenter/hospitalQualHandle">
       <el-icon><DocumentChecked /></el-icon>
       <span>资质审核</span>
     </el-menu-item>

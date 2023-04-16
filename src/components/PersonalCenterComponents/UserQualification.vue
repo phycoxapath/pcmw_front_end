@@ -71,6 +71,14 @@
     </template>
     <el-button type="success" @click="uploadFile" style="position:relative; left: 212px">确认上传</el-button>
   </el-upload>
+  <el-dialog v-model="imgEchoDialog" title="文件预览">
+    <el-image v-for="src in imageSrc" :src="src" :preview-src-list="imagePreview"></el-image>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="imgEchoDialog = false">关闭</el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <script>
@@ -81,6 +89,10 @@ export default {
   name: "userQualification",
   data(){
     return{
+      imageSrc:[],
+      imagePreview:[],
+      fileName:"",
+      imgEchoDialog:false,
       loginRole:"",
       requestURL:"",
       fileList:[
@@ -90,18 +102,22 @@ export default {
         id:""
       },
       applyData:{
-        applicationType:"",
-        userId:"",
-        docId:"",
-        hospId:"",
+        applyType:"",
+        initiatorId:"",
+        handlerId:"",
+        applyState:"审核中",
+        applyImage:"",
       },
     }
   },
   methods:{
     handlePreview(file){
-      console.log(this.fileList)
-      console.log(file.size)
-
+      this.imageSrc.splice(0,this.imageSrc.length)
+      this.imagePreview.splice(0,this.imageSrc.length)
+      let src = 'http://localhost/common/downloadImg?fileName='+this.fileName+"&role="+window.localStorage.getItem('loginRole')
+      this.imageSrc.push(src)
+      this.imagePreview.push(src)
+      this.imgEchoDialog = true
     },
     handleRemove(){
 
@@ -112,8 +128,15 @@ export default {
     handleExceed(){
 
     },
-    handleSuccess(){
+    handleSuccess(response,file,fileList){
       ElMessage.success('文件上传成功，请等待管理员审核')
+      this.fileName = response
+      this.applyData.applyImage = response
+      axios.post("http://localhost/apply/save",this.applyData).then(res=>{
+        if (res.data === 'insert fail'){
+          ElMessage.error("系统繁忙，请稍后再试！")
+        }
+      })
     },
     beforeAvatarUpload(rawFile){
       if(rawFile.size / 1024 / 1024 > 2){
@@ -124,11 +147,7 @@ export default {
     },
     uploadFile(){
       this.$refs.upload.submit()
-      axios.post("http://localhost/users/insertApply",this.applyData).then(res=>{
-        if (res.data === 'insert fail'){
-          ElMessage.error("系统繁忙，请稍后再试！")
-        }
-      })
+      console.log(this.applyData)
     },
     isUpload(){
       if (this.fileList.length !== 0){
@@ -142,23 +161,28 @@ export default {
     this.loginRole = window.localStorage.getItem('loginRole')
     this.requestURL = "http://localhost/"+this.loginRole+"/upload"
     axios.get("http://localhost/"+this.loginRole+"/getById?id="+this.extraData.id).then(res=>{
+      //页面加载完成后读取并展示已上传资质认证文件
       if (res.data.qualImage !== null && res.data.qualImage !== '') {
-        console.log(res.data)
+        this.fileName = res.data.qualImage
+        let originFileName = res.data.qualImage.substring(res.data.qualImage.lastIndexOf('/')+37)
         this.fileList.push({
-          name: res.data.qualImage,
+          name: originFileName,
           url: ""
         })
       }
+      //简单封装一些基本的数据到applyData中
       if (this.loginRole === 'doctors'){
-        this.applyData.hospId = res.data.hospId
-        this.applyData.applicationType = '从业资格认证申请'
-        this.applyData.docId = this.extraData.id
+        this.applyData.handlerId = res.data.hospId
+        this.applyData.applyType = '从业资格认证申请'
+        this.applyData.initiatorId = this.extraData.id
       }else if (this.loginRole === 'users'){
-        this.applyData.applicationType = '免挂号绿色通道预约资质申请'
-        this.applyData.userId = this.extraData.id
+        this.applyData.applyType = '免挂号绿色通道预约资质申请'
+        this.applyData.initiatorId = this.extraData.id
+        //admin id
       }else if (this.loginRole === 'hospitals'){
-        this.applyData.applicationType = '机构资质认证申请'
-        this.applyData.hospId = this.extraData.id
+        this.applyData.applyType = '机构资质认证申请'
+        this.applyData.initiatorId = this.extraData.id
+        //admin id
       }
     })
 
