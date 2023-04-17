@@ -82,8 +82,8 @@ export default {
         性别:"",
         工作日:"",
         所属科室:"",
-        资质类型:"",
-        是否取得资质:""
+        是否取得资质:"",
+        资质类型:""
       }
     }
   },
@@ -127,8 +127,11 @@ export default {
             for (const userKey in this.showData) {
               j++;
               if (i === j){
-                console.log(userKey+"+"+resKey)
-                this.showData[userKey] = res.data[resKey];
+                if (res.data[resKey] === true || res.data[resKey] === false){
+                  this.showData[userKey] = res.data[resKey] === true ? '是' : '否'
+                }else {
+                  this.showData[userKey] = res.data[resKey];
+                }
                 j = 0
                 break;
               }

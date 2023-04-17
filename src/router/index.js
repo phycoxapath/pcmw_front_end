@@ -28,7 +28,19 @@ const routes = [
   {
     path: '/medicalService',
     name: 'medicalService',
-    component: () => import('../views/MedicalService')
+    component: () => import('../views/MedicalService'),
+    children: [
+      {
+        path: 'defaultRegistry/:param1/:param2',
+        redirect:to =>{
+          return {path:'/medicalService/defaultRegistry',query:{hospId:to.params.param1,deptId:to.params.param2}}
+        }
+      },
+      {
+        path: 'defaultRegistry',
+        component: () => import('../components/MedicalServiceComponent/DefaultRegistry'),
+      }
+    ]
   },
   {
     path: '/personalCenter',

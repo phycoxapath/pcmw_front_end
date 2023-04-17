@@ -7,6 +7,7 @@ import ElementPlus, {Table} from 'element-plus'
 import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import VueCookies from "vue-cookies"
+import zhCn from "element-plus/dist/locale/zh-cn.mjs";
 
 
 const app = createApp(App)
@@ -18,4 +19,4 @@ for(const name in ElementPlusIconsVue){
     app.component( name, ElementPlusIconsVue[name]);
 }
 
-app.use(store).use(router).use(ElementPlus).use(VueCookies).mount('#app')
+app.use(store).use(router).use(ElementPlus,{locale:zhCn}).use(VueCookies).mount('#app')

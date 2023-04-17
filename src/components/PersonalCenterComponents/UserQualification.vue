@@ -52,14 +52,11 @@
       :data="extraData"
       :on-success="handleSuccess"
       :on-preview="handlePreview"
-      :on-remove="handleRemove"
-      :before-remove="beforeRemove"
       :before-upload="beforeAvatarUpload"
       :limit="1"
-      :on-exceed="handleExceed"
       :auto-upload="false"
       :drag="true"
-      :disabled="fileList.length !== 0"
+      :disabled="fileList.length !== 0 && applyState !== '被驳回'"
   >
     <template #trigger>
       <el-button type="primary" @click="isUpload"><el-icon><Upload /></el-icon>点击或拖拽文件到此处上传</el-button>
@@ -69,9 +66,22 @@
         上传的jpg/png文件大小不能超过2MB
       </div>
     </template>
-    <el-button type="success" @click="uploadFile" style="position:relative; left: 212px">确认上传</el-button>
+    <el-button type="success" @click="uploadFile" style="position:relative;left: 212px">确认上传</el-button>
   </el-upload>
-  <el-dialog v-model="imgEchoDialog" title="文件预览">
+  <div style="position:absolute;top: 494px;left: 710px;">
+    <el-button type="warning" @click="handleStateQuery">查询审核状态</el-button>
+  </div>
+
+  <el-dialog v-model="examineText" title="审核状态" draggable>
+    <el-text >您目前的资质审核状态是：</el-text>
+    <el-text :type=textType >{{applyState}}</el-text>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="examineText = false">关闭</el-button>
+      </span>
+    </template>
+  </el-dialog>
+  <el-dialog v-model="imgEchoDialog" title="文件预览" draggable>
     <el-image v-for="src in imageSrc" :src="src" :preview-src-list="imagePreview"></el-image>
     <template #footer>
       <span class="dialog-footer">
@@ -89,6 +99,9 @@ export default {
   name: "userQualification",
   data(){
     return{
+      textType:"",
+      applyState:"",
+      examineText:false,
       imageSrc:[],
       imagePreview:[],
       fileName:"",
@@ -111,7 +124,16 @@ export default {
     }
   },
   methods:{
+    handleStateQuery(){
+      axios.get("http://localhost/apply/getByInitiatorId?id="+window.localStorage.getItem('id')+"&role="+window.localStorage.getItem('loginRole')).then(res=>{
+        console.log(res.data)
+        this.applyState = res.data[res.data.length-1].applyState
+        this.textType = this.applyState === '审核中' ? 'warning' : (this.applyState === '已通过' ? 'success' : 'danger')
+      })
+      this.examineText = true
+    },
     handlePreview(file){
+      console.log(file)
       this.imageSrc.splice(0,this.imageSrc.length)
       this.imagePreview.splice(0,this.imageSrc.length)
       let src = 'http://localhost/common/downloadImg?fileName='+this.fileName+"&role="+window.localStorage.getItem('loginRole')
@@ -119,15 +141,7 @@ export default {
       this.imagePreview.push(src)
       this.imgEchoDialog = true
     },
-    handleRemove(){
 
-    },
-    beforeRemove(){
-
-    },
-    handleExceed(){
-
-    },
     handleSuccess(response,file,fileList){
       ElMessage.success('文件上传成功，请等待管理员审核')
       this.fileName = response
@@ -147,11 +161,16 @@ export default {
     },
     uploadFile(){
       this.$refs.upload.submit()
-      console.log(this.applyData)
     },
     isUpload(){
-      if (this.fileList.length !== 0){
+      if (this.fileList.length !== 0 && this.applyState === '审核中'){
         ElMessage.warning("您已经上传过认证文件了！文件正在审核中，请勿重复上传！")
+      }
+      else if (this.applyState === '已通过'){
+        ElMessage.success("恭喜您已经通过资质审核！")
+      }
+      else if (this.applyState === '被驳回'){
+        this.fileList.pop()
       }
     }
   },
@@ -185,6 +204,11 @@ export default {
         //admin id
       }
     })
+    axios.get("http://localhost/apply/getByInitiatorId?id="+window.localStorage.getItem('id')+"&role="+window.localStorage.getItem('loginRole')).then(res=>{
+      this.applyState = res.data[res.data.length-1].applyState
+      this.textType = this.applyState === '审核中' ? 'warning' : (this.applyState === '已通过' ? 'success' : 'danger')
+    })
+
 
   }
 }
