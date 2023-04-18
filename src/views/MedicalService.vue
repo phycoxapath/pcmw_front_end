@@ -63,6 +63,17 @@
         </el-sub-menu>
       </el-menu>
     </el-scrollbar>
+  </div>
+
+  <div v-for="(hospital,index) in hospitals" :key="index" :class="'div'+index">
+    <el-text size="large" style="font-size: 20px">{{hospital.hospitalName}}</el-text>
+    <br/>
+    <el-text size="large" style="position:relative; left: 100px">医院简介:</el-text>
+    <br/><br/><br/><br/><br/>
+    <el-text size="large" style="position:relative; left: 50px">热门科室</el-text>
+    <div v-for="(department,subIndex) in hospital.departments.splice(0,3)" :key="subIndex">
+      <el-button type="text">{{department.deptName}}</el-button>
+    </div>
 
   </div>
     <el-dialog
@@ -129,5 +140,28 @@ export default {
 .el-menu-vertical-demo{
   width: 200px;
   height: 700px;
+}
+.div0{
+  position: absolute;
+  left: 200px;
+  top: 90px;
+  padding-right: 1200px;
+  padding-bottom: 200px;
+}
+.div1{
+  position: absolute;
+  left: 200px;
+  top: 300px;
+  padding-right: 1200px;
+  padding-bottom: 200px;
+
+}
+.div2{
+  position: absolute;
+  left: 200px;
+  top: 500px;
+  padding-right: 1200px;
+  padding-bottom: 200px;
+
 }
 </style>

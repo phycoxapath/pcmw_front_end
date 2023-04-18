@@ -23,8 +23,8 @@
     </el-descriptions-item>
   </el-descriptions>
   <div class="deptSelector">
-    <p>请选择并选择您的科室</p>
-    <el-cascader v-model="department" :options="deptProps"  />&nbsp;
+    <p>请选择并绑定您的科室</p>
+    <el-cascader v-model="department" :options="deptProps" clearable />&nbsp;
     <el-button type="primary" color=" #ecf5ff" @click="deptSave">保存</el-button>
   </div>
 
@@ -106,6 +106,19 @@
 
     </el-table>
   </div>
+    <div>
+      <el-dialog title="重要提示" v-model="rebindDialog" draggable>
+        <el-text type="danger" size="large">您已取得资质认证，重新绑定科室将需要重新认证，您确定要这么做吗？</el-text>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button type="danger" @click="confirmReBind">确定</el-button>
+            <el-button type="success" @click="rebindDialog = false ">
+              取消
+            </el-button>
+          </span>
+        </template>
+      </el-dialog>
+    </div>
 
 </template>
 
@@ -117,6 +130,8 @@ export default {
   name: "DoctorInfoEdit",
   data(){
     return{
+      isReBind:false,
+      rebindDialog:false,
       department:[],
       deptProps:[],
       weeks:[""],
@@ -178,17 +193,26 @@ export default {
       this.lineIndex = ""
     },
     deptSave(){
-      this.docSubmitData.id = window.localStorage.getItem('id')
-      this.docSubmitData.deptId = this.department[1]
-      axios.put("http://localhost/doctors",this.docSubmitData).then(res=> {
-        if (res.data === 'update success'){
-          ElMessage.success("保存成功")
+      if (this.department.length < 2){
+        ElMessage.error("还未选择科室！")
+        return;
+      }
+      if (this.docBasicData.是否取得资质 === '是'){
+        this.rebindDialog = true
+        return
+      }
+        this.docSubmitData.id = window.localStorage.getItem('id')
+        this.docSubmitData.deptId = this.department[1]
+        axios.put("http://localhost/doctors", this.docSubmitData).then(res => {
+          if (res.data === 'update success') {
+            ElMessage.success("保存成功")
 
-        }else if (res.data === 'update fail'){
-          ElMessage.error("系统繁忙，保存失败，请稍后再试！")
-        }else
-          ElMessage.error("系统繁忙，保存失败，请稍后再试！")
-      })
+          } else if (res.data === 'update fail') {
+            ElMessage.error("系统繁忙，保存失败，请稍后再试！")
+          } else
+            ElMessage.error("系统繁忙，保存失败，请稍后再试！")
+        })
+
 
     },
     tableCellClassName({row, column, rowIndex, columnIndex}){
@@ -223,7 +247,41 @@ export default {
         })
 
       }
-    }
+    },
+    confirmReBind(){
+      this.isReBind = true
+      this.rebindDialog = false
+      this.docSubmitData.id = window.localStorage.getItem('id')
+      this.docSubmitData.deptId = this.department[1]
+      axios.put("http://localhost/doctors", this.docSubmitData).then(res => {
+        if (res.data === 'update success') {
+          ElMessage.success("保存成功")
+
+        } else if (res.data === 'update fail') {
+          ElMessage.error("系统繁忙，保存失败，请稍后再试！")
+        } else
+          ElMessage.error("系统繁忙，保存失败，请稍后再试！")
+      })
+      axios.put("http://localhost/hospitals/updateDocQual?docId="+this.docBasicData.id+"&qualification=false").then(res=>{
+        if (res.data !== 'update success')
+          ElMessage.error("系统繁忙，请稍后再试")
+      })
+      axios.get("http://localhost/apply/getByInitiatorId/?id="+window.localStorage.getItem('id')+"&role=doctors").then(res=>{
+        let applyId
+        for (let i = 0; i < res.data.length; i++) {
+          if (res.data[i].applyType === '从业资格认证申请')
+            applyId = res.data[i].id
+        }
+        let applyDTO = {
+          id:applyId,
+          applyState:'被驳回'
+        }
+        axios.put("http://localhost/apply/update",applyDTO)
+      })
+
+
+
+    },
 
 
   },
@@ -237,6 +295,7 @@ export default {
           continue;
         }
         if (resKey === 'deptName') {
+
           continue;
         }
         if (resKey === 'workingDay') {
@@ -254,7 +313,11 @@ export default {
           j++;
           if (i === j){
             console.log(userKey+"+"+resKey)
-            this.docBasicData[userKey] = res.data[resKey];
+            if (res.data[resKey] === true || res.data[resKey] === false){
+              this.docBasicData[userKey] = res.data[resKey] === true ? '是' : '否'
+            }else {
+              this.docBasicData[userKey] = res.data[resKey];
+            }
             j = 0
             break;
           }

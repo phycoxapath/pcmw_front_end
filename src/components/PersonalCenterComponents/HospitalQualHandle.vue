@@ -30,6 +30,7 @@
   </div>
   <div>
     <el-dialog v-model="detailImgDialog" title="详细信息" draggable>
+      <el-text type="danger" size="default" >所属科室：{{deptInDialog}}</el-text>
       <el-image v-for="src in imgSrc" :src=src :preview-src-list="imgPreview"></el-image>
       <template #footer>
       <span class="dialog-footer">
@@ -74,7 +75,7 @@ export default {
       applyData:[],
       handledData:[],
       applications:[],
-
+      deptInDialog:"",
     }
   },
   methods:{
@@ -87,6 +88,9 @@ export default {
         }
       }
       let src = 'http://localhost/common/downloadImg?fileName='+this.applications[index].applyImage
+      axios.get("http://localhost/doctors/getById?id="+this.applications[index].initiatorId).then(res=>{
+        this.deptInDialog = res.data.deptName
+      })
       this.imgSrc[0] = src
       this.imgPreview[0] = src
       this.detailImgDialog = true
@@ -100,26 +104,39 @@ export default {
         }
       }
       Date.prototype.toLocaleString = function (){
+        let monthLessTen = ""
+        let dateLessTen = ""
+        let hourLessTen = ""
+        let minuteLessTen = ""
+        let secondLessTen = ""
         if (this.getMinutes() < 10){
-          this.setMinutes("0"+this.getMinutes())
+          minuteLessTen = "0"
         }
         if (this.getHours() < 10){
-          this.setHours("0"+this.getHours())
+          hourLessTen = "0"
         }
         if (this.getSeconds() < 10){
-          this.setSeconds("0"+this.getSeconds())
+          secondLessTen = "0"
         }
+        if (this.getMonth() < 9){
+          monthLessTen = "0"
+        }
+        if (this.getDate() < 10){
+          dateLessTen = "0"
+        }
+
+
         return (
             this.getFullYear() +
-            "-" +
+            "-" +monthLessTen+
             (this.getMonth() + 1) +
-            "-" +
+            "-" +dateLessTen+
             this.getDate() +
-            " " +
+            " " +hourLessTen+
             this.getHours() +
-            ":" +
+            ":" +minuteLessTen+
             this.getMinutes() +
-            ":" +
+            ":" +secondLessTen+
             this.getSeconds()
 
         );
@@ -135,7 +152,7 @@ export default {
             ElMessage.success("处理成功")
             this.handledData.push(this.applications[index])
             this.applyData.splice(rowIndex,1)
-            axios.put("http://localhost/hospitals/updateDocQual?docId="+this.applications[index].initiatorId).then(res=>{
+            axios.put("http://localhost/hospitals/updateDocQual?docId="+this.applications[index].initiatorId+"&qualification=true").then(res=>{
               if (res.data !== 'update success')
                 ElMessage.error("系统繁忙，请稍后再试")
             })
@@ -162,21 +179,33 @@ export default {
           ElMessage.success("处理成功")
           this.handledData.push(this.applications[index])
           this.applyData.splice(rowIndex,1)
+
         }
         else
           ElMessage.error("系统繁忙，请稍后再试！")
       })
     },
     reHandle(rowIndex,row){
-      this.handledData[rowIndex].applyState = '待审核'
+      let index;
+      for (let i = 0; i < this.applications.length; i++) {
+        if (row.id === this.applications[i].id){
+          index = i
+          break
+        }
+      }
+      this.handledData[rowIndex].applyState = '审核中'
       this.applyDTO.id = row.id
-      this.applyDTO.applyState = '待审核'
+      this.applyDTO.applyState = '审核中'
       console.log(this.applyDTO)
       axios.put("http://localhost/apply/update",this.applyDTO).then(res=>{
         if (res.data === 'update success') {
           ElMessage.success("操作成功")
           this.applyData.unshift(this.handledData[rowIndex])
           this.handledData.splice(rowIndex,1)
+          axios.put("http://localhost/hospitals/updateDocQual?docId="+this.applications[index].initiatorId+"&qualification=false").then(res=>{
+            if (res.data !== 'update success')
+              ElMessage.error("系统繁忙，请稍后再试")
+          })
         }
         else
           ElMessage.error("系统繁忙，请稍后再试！")
@@ -186,6 +215,44 @@ export default {
   mounted() {
 
     axios.get("http://localhost/apply/getByHandlerId?id="+window.localStorage.getItem('id')+"&role="+window.localStorage.getItem('loginRole')).then(res=>{
+      Date.prototype.toLocaleString = function (){
+        let monthLessTen = ""
+        let dateLessTen = ""
+        let hourLessTen = ""
+        let minuteLessTen = ""
+        let secondLessTen = ""
+        if (this.getMinutes() < 10){
+          minuteLessTen = "0"
+        }
+        if (this.getHours() < 10){
+          hourLessTen = "0"
+        }
+        if (this.getSeconds() < 10){
+          secondLessTen = "0"
+        }
+        if (this.getMonth() < 9){
+          monthLessTen = "0"
+        }
+        if (this.getDate() < 10){
+          dateLessTen = "0"
+        }
+
+
+        return (
+            this.getFullYear() +
+            "-" +monthLessTen+
+            (this.getMonth() + 1) +
+            "-" +dateLessTen+
+            this.getDate() +
+            " " +hourLessTen+
+            this.getHours() +
+            ":" +minuteLessTen+
+            this.getMinutes() +
+            ":" +secondLessTen+
+            this.getSeconds()
+
+        );
+      }
       this.applications = res.data
       for (let i = 0; i < res.data.length; i++) {
         res.data[i].applyTime = new Date(res.data[i].applyTime).toLocaleString()

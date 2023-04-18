@@ -114,7 +114,11 @@ export default {
         for (const userKey in this.userData) {
           j++;
           if (i === j){
-            this.userData[userKey] = res.data[resKey];
+            if (res.data[resKey] === true || res.data[resKey] === false){
+              this.userData[userKey] = res.data[resKey] === true ? '是' : '否'
+            }else {
+              this.userData[userKey] = res.data[resKey];
+            }
             j = 0
             break;
           }

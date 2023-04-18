@@ -33,8 +33,8 @@ export default {
   data(){
     return{
       appointDialog:false,
-      hospId:this.$route.query.hospId,
-      deptId:this.$route.query.deptId,
+      hospId:0,
+      deptId:0,
       doctors:[],
       range:[new Date(),new Date().setMonth(new Date().getMonth()+1)],
     }
@@ -61,7 +61,11 @@ export default {
       this.hospId = this.$route.query.hospId
       this.deptId = this.$route.query.deptId
       axios.get("http://localhost/doctors/getByDeptId?deptId="+this.deptId).then(res=>{
-        this.doctors = res.data
+        for (let i = 0; i < res.data.length; i++) {
+          if (res.data[i].qualification){
+            this.doctors.push(res.data[i])
+          }
+        }
       })
     }
   },
@@ -69,7 +73,11 @@ export default {
     this.hospId = this.$route.query.hospId
     this.deptId = this.$route.query.deptId
     axios.get("http://localhost/doctors/getByDeptId?deptId="+this.deptId).then(res=>{
-      this.doctors = res.data
+      for (let i = 0; i < res.data.length; i++) {
+        if (res.data[i].qualification){
+          this.doctors.push(res.data[i])
+        }
+      }
     })
   }
 }

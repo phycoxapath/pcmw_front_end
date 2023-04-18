@@ -100,6 +100,7 @@ export default {
   data(){
     return{
       textType:"",
+      consistency:true,
       applyState:"",
       examineText:false,
       imageSrc:[],
@@ -126,7 +127,36 @@ export default {
   methods:{
     handleStateQuery(){
       axios.get("http://localhost/apply/getByInitiatorId?id="+window.localStorage.getItem('id')+"&role="+window.localStorage.getItem('loginRole')).then(res=>{
-        console.log(res.data)
+        // switch (window.localStorage.getItem('loginRole')){
+        //   case 'users':{
+        //     console.log("user")
+        //     for (let i = 0; i < res.data.length; i++) {
+        //       if (res.data[i].applyType === '免挂号绿色通道预约资质申请'){
+        //         this.applyState = res.data[i].applyState
+        //       }
+        //     }
+        //     break
+        //   }
+        //   case 'doctors':{
+        //     console.log("doctor")
+        //     for (let i = 0; i < res.data.length; i++) {
+        //       if (res.data[i].applyType === '从业资格认证申请'){
+        //         this.applyState = res.data[i].applyState
+        //       }
+        //     }
+        //     break
+        //   }
+        //   case 'hospitals':{
+        //
+        //     for (let i = 0; i < res.data.length; i++) {
+        //       if (res.data[i].applyType === '机构资质认证申请'){
+        //         this.applyState = res.data[i].applyState
+        //       }
+        //     }
+        //     break
+        //   }
+        //
+        // }
         this.applyState = res.data[res.data.length-1].applyState
         this.textType = this.applyState === '审核中' ? 'warning' : (this.applyState === '已通过' ? 'success' : 'danger')
       })
@@ -205,8 +235,10 @@ export default {
       }
     })
     axios.get("http://localhost/apply/getByInitiatorId?id="+window.localStorage.getItem('id')+"&role="+window.localStorage.getItem('loginRole')).then(res=>{
-      this.applyState = res.data[res.data.length-1].applyState
+
+      this.applyState = res.data[res.data.length-1]
       this.textType = this.applyState === '审核中' ? 'warning' : (this.applyState === '已通过' ? 'success' : 'danger')
+
     })
 
 
