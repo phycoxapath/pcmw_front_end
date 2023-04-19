@@ -1,6 +1,6 @@
 <template>
   <router-view></router-view>
-  <div  v-show="show">
+  <div  v-show="show" style=" position: fixed;">
     <el-scrollbar style="height: 100%">
       <el-menu
           active-text-color="#337ecc"
@@ -65,17 +65,18 @@
     </el-scrollbar>
   </div>
 
-  <div v-for="(hospital,index) in hospitals" :key="index" :class="'div'+index">
-    <el-text size="large" style="font-size: 20px">{{hospital.hospitalName}}</el-text>
-    <br/>
-    <el-text size="large" style="position:relative; left: 100px">医院简介:</el-text>
-    <br/><br/><br/><br/><br/>
-    <el-text size="large" style="position:relative; left: 50px">热门科室</el-text>
-    <div v-for="(department,subIndex) in hospital.departments.splice(0,3)" :key="subIndex">
-      <el-button type="text">{{department.deptName}}</el-button>
-    </div>
-
-  </div>
+<!--  <el-card class="box-card0" :body-style="{backgroundColor:'#eafcff',padding:'100px'}">-->
+<!--    <template #header>-->
+<!--      <div class="card-header">-->
+<!--        <span>Card name</span>-->
+<!--        <el-button class="button" text>Operation button</el-button>-->
+<!--      </div>-->
+<!--    </template>-->
+<!--    <div style="position:relative;bottom: 50px">-->
+<!--      <span>123400000000000</span>-->
+<!--    </div>-->
+<!--    -->
+<!--  </el-card>-->
     <el-dialog
         v-model="loginPrompt"
         title=""
@@ -144,24 +145,49 @@ export default {
 .div0{
   position: absolute;
   left: 200px;
-  top: 90px;
-  padding-right: 1200px;
-  padding-bottom: 200px;
+  top: 150px;
+  padding-right: 600px;
+  padding-bottom: 70px;
+  border: 2px solid #eafcff;
+  background-color: #eafcff;
 }
 .div1{
   position: absolute;
   left: 200px;
-  top: 300px;
-  padding-right: 1200px;
-  padding-bottom: 200px;
-
+  top: 350px;
+  padding-right: 600px;
+  padding-bottom: 70px;
+  border: 2px solid #eafcff;
+  background-color: #eafcff;
 }
 .div2{
   position: absolute;
   left: 200px;
-  top: 500px;
-  padding-right: 1200px;
-  padding-bottom: 200px;
+  top: 550px;
+  padding-right: 600px;
+  padding-bottom: 70px;
+  border: 2px solid #eafcff;
+  background-color: #eafcff;
+}
+.dept0{
+  position: absolute;
+  left: 150px;
+  top: 86px;
+}
+.dept1{
+  position: absolute;
+  left: 200px;
+  top: 86px;
+}
+.dept2{
+  position: absolute;
+  left: 250px;
+  top: 86px;
+}
+.box-card0{
+  position: absolute;
+  left: 250px;
+  top: 86px;
 
 }
 </style>

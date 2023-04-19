@@ -10,8 +10,8 @@
       <template #label>
         {{index}}
       </template>
-      {{attr}}<el-input v-model="newValue" :value=attr v-if="index === lineIndex && index!=='性别'"></el-input>
-
+      {{attr}}<el-input v-model="newValue" :value="attr" v-if="index === lineIndex && index!=='性别' && index!=='医生简介'  " ></el-input>
+      <el-input v-model="newValue" type="textarea" v-if="index === lineIndex && index==='医生简介'"></el-input>
       <el-radio-group v-if="index === '性别' &&index === lineIndex" v-model="newGender">
         <el-radio label="男" size="large">男</el-radio>
         <el-radio label="女" size="large">女</el-radio>
@@ -144,6 +144,7 @@ export default {
         工号:"",
         姓名:"",
         性别:"",
+        医生简介:"",
         是否取得资质:"",
         资质类型:""
       },
@@ -153,6 +154,7 @@ export default {
         docName:"",
         gender:"",
         workingDay:"",
+        docProfile:"",
         deptId:"",
         qualification:"",
         qualType:""
@@ -176,6 +178,10 @@ export default {
       if (type === '性别'){
         this.docBasicData.性别 = this.newGender
         this.docSubmitData.gender = this.newGender
+      }
+      if (type === '医生简介'){
+        this.docBasicData.医生简介 = this.newValue
+        this.docSubmitData.docProfile = this.newValue
       }
       console.log(this.docSubmitData)
       axios.put("http://localhost/doctors",this.docSubmitData).then(res =>{

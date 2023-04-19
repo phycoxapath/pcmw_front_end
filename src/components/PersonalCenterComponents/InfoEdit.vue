@@ -49,6 +49,7 @@ export default {
       userData:{
         id:"",
         用户名:"",
+        姓名:"",
         性别:"",
         年龄:"",
         收货地址:"",
@@ -58,6 +59,7 @@ export default {
       user:{
         id:"",
         loginName:"",
+        userName:"",
         gender:"",
         age:0,
         address:""
@@ -92,6 +94,10 @@ export default {
       else if (type === '收货地址'){
         this.userData.收货地址 = newValue
         this.user.address = newValue
+      }
+      else if (type === '姓名'){
+        this.userData.姓名 = newValue
+        this.user.userName = newValue
       }
       this.user.id = window.localStorage.getItem('id')
       axios.put("http://localhost/users",this.user).then(res =>{

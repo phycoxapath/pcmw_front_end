@@ -104,27 +104,11 @@ export default {
         }
       }
       Date.prototype.toLocaleString = function (){
-        let monthLessTen = ""
-        let dateLessTen = ""
-        let hourLessTen = ""
-        let minuteLessTen = ""
-        let secondLessTen = ""
-        if (this.getMinutes() < 10){
-          minuteLessTen = "0"
-        }
-        if (this.getHours() < 10){
-          hourLessTen = "0"
-        }
-        if (this.getSeconds() < 10){
-          secondLessTen = "0"
-        }
-        if (this.getMonth() < 9){
-          monthLessTen = "0"
-        }
-        if (this.getDate() < 10){
-          dateLessTen = "0"
-        }
-
+        let monthLessTen = this.getMonth() < 10 ? "0": ""
+        let dateLessTen = this.getDate() < 10 ? "0" : ""
+        let hourLessTen = this.getHours() < 10 ? "0" : ""
+        let minuteLessTen = this.getMinutes() < 10 ? "0" : ""
+        let secondLessTen = this.getSeconds() <10 ? "0" : ""
 
         return (
             this.getFullYear() +
@@ -216,27 +200,11 @@ export default {
 
     axios.get("http://localhost/apply/getByHandlerId?id="+window.localStorage.getItem('id')+"&role="+window.localStorage.getItem('loginRole')).then(res=>{
       Date.prototype.toLocaleString = function (){
-        let monthLessTen = ""
-        let dateLessTen = ""
-        let hourLessTen = ""
-        let minuteLessTen = ""
-        let secondLessTen = ""
-        if (this.getMinutes() < 10){
-          minuteLessTen = "0"
-        }
-        if (this.getHours() < 10){
-          hourLessTen = "0"
-        }
-        if (this.getSeconds() < 10){
-          secondLessTen = "0"
-        }
-        if (this.getMonth() < 9){
-          monthLessTen = "0"
-        }
-        if (this.getDate() < 10){
-          dateLessTen = "0"
-        }
-
+        let monthLessTen = this.getMonth() < 10 ? "0": ""
+        let dateLessTen = this.getDate() < 10 ? "0" : ""
+        let hourLessTen = this.getHours() < 10 ? "0" : ""
+        let minuteLessTen = this.getMinutes() < 10 ? "0" : ""
+        let secondLessTen = this.getSeconds() <10 ? "0" : ""
 
         return (
             this.getFullYear() +
