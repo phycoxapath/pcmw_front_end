@@ -44,6 +44,10 @@
       <el-icon><EditPen /></el-icon>
       <span>修改密码</span>
     </el-menu-item>
+    <el-menu-item v-show="loginRole === 'users'" index="/personalCenter/hospitalQualHandle">
+      <el-icon><DocumentChecked /></el-icon>
+      <span>我的预约</span>
+    </el-menu-item>
     <el-menu-item v-show="loginRole === 'hospitals'" index="/personalCenter/hospitalQualHandle">
       <el-icon><DocumentChecked /></el-icon>
       <span>资质审核</span>
@@ -114,9 +118,7 @@ export default {
               this.qualificationIndex = 'userQualification'
               break
       }
-      axios.get("http://localhost/" + window.localStorage.getItem('loginRole') + "/getByName?name="+window.localStorage.getItem('loginState')).then(res => {
-        window.localStorage.setItem('id', res.data.id)
-      })
+
     }
   }
 }

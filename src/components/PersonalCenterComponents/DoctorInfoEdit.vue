@@ -108,7 +108,7 @@
   </div>
     <div>
       <el-dialog title="重要提示" v-model="rebindDialog" draggable>
-        <el-text type="danger" size="large">您已取得资质认证，重新绑定科室将需要重新认证，您确定要这么做吗？</el-text>
+        <el-text type="danger" size="large">您已上传资质认证，重新绑定科室将需要重新上传认证，您确定要这么做吗？</el-text>
         <template #footer>
           <span class="dialog-footer">
             <el-button type="danger" @click="confirmReBind">确定</el-button>
@@ -130,6 +130,7 @@ export default {
   name: "DoctorInfoEdit",
   data(){
     return{
+      applyState: "",
       isReBind:false,
       rebindDialog:false,
       department:[],
@@ -201,9 +202,14 @@ export default {
     deptSave(){
       if (this.department.length < 2){
         ElMessage.error("还未选择科室！")
-        return;
+        return
       }
-      if (this.docBasicData.是否取得资质 === '是'){
+
+      if (this.isReBind){
+        this.rebindDialog = true
+        return false
+      }
+      if (this.docBasicData.是否取得资质 === '是' || this.applyState === '审核中'){
         this.rebindDialog = true
         return
       }
@@ -255,7 +261,7 @@ export default {
       }
     },
     confirmReBind(){
-      this.isReBind = true
+      this.isReBind = false
       this.rebindDialog = false
       this.docSubmitData.id = window.localStorage.getItem('id')
       this.docSubmitData.deptId = this.department[1]
@@ -273,11 +279,7 @@ export default {
           ElMessage.error("系统繁忙，请稍后再试")
       })
       axios.get("http://localhost/apply/getByInitiatorId/?id="+window.localStorage.getItem('id')+"&role=doctors").then(res=>{
-        let applyId
-        for (let i = 0; i < res.data.length; i++) {
-          if (res.data[i].applyType === '从业资格认证申请')
-            applyId = res.data[i].id
-        }
+        let applyId = res.data[res.data.length-1].id
         let applyDTO = {
           id:applyId,
           applyState:'被驳回'
@@ -347,6 +349,9 @@ export default {
         })
         }
       }
+    })
+    axios.get("http://localhost/apply/getByInitiatorId/?id="+window.localStorage.getItem('id')+"&role=doctors").then(res=>{
+      this.applyState = res.data[res.data.length-1].applyState
     })
   }
 }

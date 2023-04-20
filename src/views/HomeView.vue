@@ -4,10 +4,28 @@
 
 <script>
 
+import axios from "axios";
+
 export default {
   name: 'HomeView',
   components: {
 
+  },
+  watch:{
+    '$route' (to , from){
+      if (window.localStorage.getItem('loginState') !== '' || window.localStorage.getItem('loginState') !== null) {
+        axios.get("http://localhost/" + window.localStorage.getItem('loginRole') + "/getByName?name="+window.localStorage.getItem('loginState')).then(res => {
+          window.localStorage.setItem('id', res.data.id)
+        })
+      }
+    }
+  },
+  mounted() {
+    if (window.localStorage.getItem('loginState') !== '' || window.localStorage.getItem('loginState') !== null) {
+      axios.get("http://localhost/" + window.localStorage.getItem('loginRole') + "/getByName?name="+window.localStorage.getItem('loginState')).then(res => {
+        window.localStorage.setItem('id', res.data.id)
+      })
+    }
   }
 }
 </script>

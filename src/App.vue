@@ -10,7 +10,7 @@
     @select="handleSelect"
 >
   <el-menu-item index="/" style="width: 150px">首页</el-menu-item>
-  <el-menu-item index="/medicalService" class="menu-style">医疗业务</el-menu-item>
+  <el-menu-item index="/medicalService" class="menu-style" v-show="!this.loginState||this.loginRole==='users'">医疗业务</el-menu-item>
   <el-menu-item index="2" class="menu-style">疫苗管理</el-menu-item>
   <el-menu-item index="3" class="menu-style">商城入口</el-menu-item>
   <div class="flex-grow" />
@@ -33,6 +33,7 @@ export default {
   data(){
     return{
       loginState:"",
+      loginRole:"",
       exitLogin:""
     }
   },
@@ -51,6 +52,7 @@ export default {
   },
   mounted() {
     this.loginState = window.localStorage.getItem('loginState')
+    this.loginRole = window.localStorage.getItem('loginRole')
   }
 }
 </script>

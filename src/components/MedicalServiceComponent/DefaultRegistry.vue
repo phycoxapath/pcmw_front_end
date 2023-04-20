@@ -1,4 +1,5 @@
 <template>
+  <h1>{{timeFragment}}</h1>
 <!--  style="position:absolute;top: 100px;left: 400px"-->
   <div style="position:absolute;top: 100px;left: 400px">
     <el-calendar style="width: 70%;" :range="range">
@@ -26,7 +27,7 @@
 <!--    </el-calendar>-->
 <!--  </div>-->
   <div>
-    <el-dialog v-model="appointDialog" title="预约详情" >
+    <el-dialog v-model="appointDialog" title="预约详情" width="1000px" draggable>
       <el-table height="500" :data="appointDetail">
         <el-table-column label="医生姓名" prop="docName" />
         <el-table-column label="性别" prop="gender" />
@@ -34,10 +35,20 @@
         <el-table-column label="医生简介" prop="docProfile" />
         <el-table-column label="预约时间段" prop="timeFragment" >
           <template #default="scope">
-            <el-select v-model="timeFragment" placeholder="请选择时间段" >
-              <el-option key="1" label="9:00" value="9"/>
-              <el-option key="2" label="15:00" value="15"/>
+            <el-select  v-model="timeFragment[scope.$index]" placeholder="请选择时间段" >
+              <el-option key="1" label="9:00" value="9:00:00"/>
+              <el-option key="2" label="15:00" value="15:00:00"/>
             </el-select>
+          </template>
+        </el-table-column>
+        <el-table-column label="备注" prop="appointAppendix" >
+          <template #default="scope">
+            <el-popover placement="bottom" width="400" trigger="click">
+              <template #reference>
+                <el-button size="small">点击填写</el-button>
+              </template>
+              <el-input type="textarea" v-model="appendix" placeholder="填写备注（200字以内）"></el-input>
+            </el-popover>
           </template>
         </el-table-column>
         <el-table-column label="操作" prop="handle" >
@@ -53,12 +64,14 @@
 
 <script>
 import axios from "axios";
+import {ElMessage} from "element-plus";
 
 export default {
   name: "DefaultRegistry",
   data(){
     return{
-      timeFragment:"",
+      appendix:"",
+      timeFragment:[],
       appointDetail:[],
       appointDialog:false,
       hospId:0,
@@ -67,12 +80,15 @@ export default {
       deptName:"",
       doctors:[],
       range:[new Date(),new Date().setMonth(new Date().getMonth()+1)],
+      appointmentDTO:{},
     }
   },
   methods:{
     registryHandle(data){
       console.log(data)
       console.log(this.doctors)
+      this.appendix = ""
+      this.timeFragment.splice(0,this.timeFragment.length)
       Date.prototype.toLocaleString = function (){
         let monthLessTen = this.getMonth() < 10 ? "0": ""
         let dateLessTen = this.getDate() < 10 ? "0" : ""
@@ -122,7 +138,26 @@ export default {
     },
     submitAppoint(rowIndex,row){
       console.log(row.timeFragment)
-      console.log(this.timeFragment)
+      if (!this.timeFragment){
+        ElMessage.error("请选择预约时间段!")
+        return false
+      }
+      row.timeFragment = row.timeFragment +' '+ this.timeFragment[rowIndex]
+      if (this.appendix.length > 200){
+        ElMessage.error("备注字数超出限制!")
+        return false
+      }
+      this.appointmentDTO.initiatorId = window.localStorage.getItem('id')
+      this.appointmentDTO.handlerId = this.doctors[rowIndex].id
+      this.appointmentDTO.appointType = '普通预约'
+      this.appointmentDTO.appointAppendix = this.appendix
+      this.appointmentDTO.appointTime = row.timeFragment
+      axios.post("http://localhost/appointments/saveAppointment",this.appointmentDTO).then(res =>{
+        if (res.data === 'save success')
+          ElMessage.success("预约成功!")
+        else
+          ElMessage.error("系统繁忙，请稍后再试!")
+      })
 
     }
   },
