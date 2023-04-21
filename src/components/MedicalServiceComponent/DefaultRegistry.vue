@@ -1,5 +1,4 @@
 <template>
-  <h1>{{timeFragment}}</h1>
 <!--  style="position:absolute;top: 100px;left: 400px"-->
   <div style="position:absolute;top: 100px;left: 400px">
     <el-calendar style="width: 70%;" :range="range">
@@ -27,8 +26,9 @@
 <!--    </el-calendar>-->
 <!--  </div>-->
   <div>
-    <el-dialog v-model="appointDialog" title="预约详情" width="1000px" draggable>
+    <el-dialog v-model="appointDialog" title="预约详情" width="1050px" draggable>
       <el-table height="500" :data="appointDetail">
+        <el-table-column label="序号" prop="originIndex" ></el-table-column>
         <el-table-column label="医生姓名" prop="docName" />
         <el-table-column label="性别" prop="gender" />
         <el-table-column label="科室" prop="deptName" />
@@ -53,7 +53,8 @@
         </el-table-column>
         <el-table-column label="操作" prop="handle" >
           <template #default="scope">
-            <el-button size="small" @click="submitAppoint(scope.$index,scope.row)">预约</el-button>
+            <el-button size="small"  type="success" @click="submitAppoint(scope.row.originIndex,scope.row)">预约</el-button>
+            <el-text size="small" style="float: right;">剩余：{{this.doctors[scope.row.originIndex].remainRegistry}}</el-text>
           </template>
         </el-table-column>
       </el-table>
@@ -113,13 +114,16 @@ export default {
       }
       this.appointDetail.splice(0,this.appointDetail.length)
       for (let i = 0; i < this.doctors.length; i++) {
-        this.appointDetail.push({
-          docName:this.doctors[i].docName,
-          gender:this.doctors[i].gender,
-          deptName:this.doctors[i].deptName,
-          docProfile:this.doctors[i].docProfile,
-          timeFragment:data.day,
-        })
+        if ((2**((7-data.date.getDay())%7) & this.doctors[i].workingDay) > 0) {
+          this.appointDetail.push({
+            originIndex:i,
+            docName: this.doctors[i].docName,
+            gender: this.doctors[i].gender,
+            deptName: this.doctors[i].deptName,
+            docProfile: this.doctors[i].docProfile,
+            timeFragment: data.day,
+          })
+        }
       }
 
       this.appointDialog = true
@@ -129,6 +133,7 @@ export default {
         if (data.date < new Date() || (data.date.getMonth-new Date().getMonth())*30+data.date.getDate-new Date().getDate() > 30)
           return false
         if ((2**((7-data.date.getDay())%7) & this.doctors[i].workingDay) > 0){
+          if (this.doctors[i].remainRegistry > 0)
           return true
         }
         if (i === this. doctors.length - 1)
@@ -138,7 +143,11 @@ export default {
     },
     submitAppoint(rowIndex,row){
       console.log(row.timeFragment)
-      if (!this.timeFragment){
+      if (this.doctors[rowIndex].remainRegistry <= 0){
+        ElMessage.error("当前医生已无号!")
+        return false
+      }
+      if (this.timeFragment.length === 0){
         ElMessage.error("请选择预约时间段!")
         return false
       }
@@ -153,8 +162,10 @@ export default {
       this.appointmentDTO.appointAppendix = this.appendix
       this.appointmentDTO.appointTime = row.timeFragment
       axios.post("http://localhost/appointments/saveAppointment",this.appointmentDTO).then(res =>{
-        if (res.data === 'save success')
+        if (res.data === 'save success') {
           ElMessage.success("预约成功!")
+          this.appointDialog = false
+        }
         else
           ElMessage.error("系统繁忙，请稍后再试!")
       })
@@ -171,6 +182,22 @@ export default {
           if (res.data[i].qualification){
             this.doctors.push(res.data[i])
           }
+          for (let i = 0; i < this.doctors.length; i++) {
+            axios.get("http://localhost/appointments/getCountByHandlerId?id="+this.doctors[i].id).then(res=>{
+              this.doctors[i].remainRegistry = 10-res.data
+            }).catch(err=>{
+              if (err.response) {
+                // 请求已发出，但服务器响应的状态码不在 2xx 范围内
+                console.log(err.response.data);
+                console.log(err.response.status);
+                console.log(err.response.headers);
+              } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error', err.message);
+              }
+              console.log(err.config);
+            })
+          }
         }
       })
       axios.get("http://localhost/hospitals/getById?id="+this.hospId).then(res=>{
@@ -183,7 +210,8 @@ export default {
           }
         }
       })
-    }
+    },
+
   },
   mounted() {
     this.hospId = this.$route.query.hospId
@@ -195,6 +223,22 @@ export default {
           this.doctors.push(res.data[i])
         }
       }
+      for (let i = 0; i < this.doctors.length; i++) {
+        axios.get("http://localhost/appointments/getCountByHandlerId?id="+this.doctors[i].id).then(res=>{
+          this.doctors[i].remainRegistry = 10-res.data
+        }).catch(err=>{
+          if (err.response) {
+            // 请求已发出，但服务器响应的状态码不在 2xx 范围内
+            console.log(err.response.data);
+            console.log(err.response.status);
+            console.log(err.response.headers);
+          } else {
+            // Something happened in setting up the request that triggered an Error
+            console.log('Error', err.message);
+          }
+          console.log(err.config);
+        })
+      }
     })
     axios.get("http://localhost/hospitals/getById?id="+this.hospId).then(res=>{
       this.hospName = res.data.hospitalName
@@ -205,6 +249,7 @@ export default {
         }
       }
     })
+
   }
 }
 </script>

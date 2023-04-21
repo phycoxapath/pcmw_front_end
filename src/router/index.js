@@ -78,7 +78,17 @@ const routes = [
         component: () => import('../components/PersonalCenterComponents/HospitalQualHandle')
       },
 
+      {
+        path: 'userAppointMana',
+        component: () => import('../components/PersonalCenterComponents/UserAppointMana')
+      },
+
     ]
+  },
+  {
+    path: '/appointManaView',
+    name: 'appointManaView',
+    component: () => import('../views/AppointManaView')
   },
   {
     path: '/resetPassword',
