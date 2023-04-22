@@ -10,10 +10,13 @@
       <template #label>
         {{index}}
       </template>
-      {{attr}}<el-input v-model="newValue" :value=attr v-if="index === lineIndex && index!=='性别'"></el-input>
+      <span v-show="index !== '医院简介'">{{attr}}</span>
+      <el-input v-model="newValue" :value=attr v-if="index === lineIndex && index!=='医院简介'"></el-input>
+      <el-input v-model="newValue" type="textarea" rows="5" :placeholder="attr" v-if="index === lineIndex && index==='医院简介'"></el-input>
       <!--      <el-input v-model="newAge" v-if="index ==='年龄'"></el-input>-->
       <!--      <el-input v-model="newAddr" v-if="index ==='收货地址'"></el-input>-->
       <el-button @click="modify(index)" v-if="attr !== '' &&attr!== null && index!=='id' && index!== '是否取得资质' && index!== '资质类型' && index!==lineIndex" type="primary" color=" #ecf5ff" ><el-icon><Edit/></el-icon>修改</el-button>
+      <el-button @click="modify(index)" v-else-if="index!=='id' && index!== '是否取得资质' && index!== '资质类型' && index !== lineIndex" type="primary" color=" #ecf5ff" ><el-icon><Edit/></el-icon>添加</el-button>
       <el-button @click="save(index,newValue)" type="primary" color=" #ecf5ff" v-show="index === lineIndex">保存</el-button>
       <el-button @click="cancel" type="primary" color=" #ecf5ff" v-show="index === lineIndex">取消</el-button>
     </el-descriptions-item>
@@ -100,12 +103,14 @@ export default {
       hospitalData:{
         id:"",
         医院名称:"",
+        医院简介:"",
         是否取得资质:"",
         资质类型:""
       },
       hospital:{
         id:"",
         hospitalName:"",
+        hospitalDescription:"",
       }
     }
   },
@@ -117,9 +122,15 @@ export default {
       this.lineIndex = ""
     },
     save(type,newValue){
-      this.hospitalData.医院名称 = newValue
-      this.hospital.hospitalName = newValue
       this.hospital.id = window.localStorage.getItem('id')
+      if (type === '医院名称') {
+        this.hospitalData.医院名称 = newValue
+        this.hospital.hospitalName = newValue
+      }
+      if (type === '医院简介') {
+        this.hospitalData.医院简介 = newValue
+        this.hospital.hospitalDescription = newValue
+      }
       axios.put("http://localhost/hospitals",this.hospital).then(res =>{
         if (res.data === 'update success'){
           ElMessage.success("保存成功")
@@ -253,13 +264,13 @@ export default {
 <style scoped>
 .margin-top{
   position: absolute;
-  top: 70px;
-  left: 550px;
+  top: 200px;
+  left: 250px;
 }
 .transfer-style{
   position: absolute;
-  top: 345px;
-  left: 550px;
+  top: 200px;
+  left: 950px;
 }
 .transfer-footer {
   margin-left: 15px;

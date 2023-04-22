@@ -15,7 +15,8 @@
      <template #label>
          {{index}}
      </template>
-     <span v-show="index !== '工作日'" @click="test(attr)">{{attr}}</span>
+     <span v-show="index !== '工作日' && index !=='医院简介' && index !== '医生简介'" @click="test(attr)">{{attr}}</span>
+     <el-button type="" v-show="index === '医院简介'||index === '医生简介'" @click="showHospitalDetail(index,attr)">点击查看</el-button>
      <span v-show="index === '工作日' && (attr & week.Mon) > 0">周一 </span>
      <span v-show="index === '工作日' && (attr & week.Tues) > 0">周二 </span>
      <span v-show="index === '工作日' && (attr & week.Wed) > 0">周三 </span>
@@ -34,7 +35,12 @@
       </el-table>
 
   </div>
-
+  <el-dialog :title="title" v-model="isShowDetail" draggable>
+    <el-input type="textarea" disabled rows="6" v-model="details"></el-input>
+    <template #footer>
+      <el-button type="primary" @click="isShowDetail = false">关闭</el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <script>
@@ -43,6 +49,9 @@ export default {
   name: "PersonalInfo",
   data(){
     return{
+      isShowDetail:false,
+      title:"",
+      details:"",
       loginRole:"",
       infoCompletion:false,
       week:{
@@ -73,6 +82,7 @@ export default {
       hospitalData:{
         id:"",
         医院名称:"",
+        医院简介:"",
         是否取得资质:"",
         资质类型:""
       },
@@ -92,6 +102,11 @@ export default {
   methods:{
     test(workingDay){
       console.log((workingDay & this.week.Mon)>0)
+    },
+    showHospitalDetail(type,value){
+      this.isShowDetail = true
+      this.title = type
+      this.details = value
     }
   },
   mounted() {

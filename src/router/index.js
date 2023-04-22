@@ -39,7 +39,11 @@ const routes = [
       {
         path: 'defaultRegistry',
         component: () => import('../components/MedicalServiceComponent/DefaultRegistry'),
-      }
+      },
+      {
+        path: 'greenChannelRegistry',
+        component: () => import('../components/MedicalServiceComponent/GreenChannelRegistry'),
+      },
     ]
   },
   {

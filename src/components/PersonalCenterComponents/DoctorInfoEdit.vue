@@ -10,8 +10,9 @@
       <template #label>
         {{index}}
       </template>
-      {{attr}}<el-input v-model="newValue" :value="attr" v-if="index === lineIndex && index!=='性别' && index!=='医生简介'  " ></el-input>
-      <el-input v-model="newValue" type="textarea" v-if="index === lineIndex && index==='医生简介'"></el-input>
+      <span v-show="index !== '医生简介'">{{attr}}</span>
+      <el-input v-model="newValue" :value="attr" v-if="index === lineIndex && index!=='性别' && index!=='医生简介'  " ></el-input>
+      <el-input v-model="newValue" type="textarea" :placeholder="attr" v-if="index === lineIndex && index==='医生简介'"></el-input>
       <el-radio-group v-if="index === '性别' &&index === lineIndex" v-model="newGender">
         <el-radio label="男" size="large">男</el-radio>
         <el-radio label="女" size="large">女</el-radio>
