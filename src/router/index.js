@@ -95,6 +95,11 @@ const routes = [
     component: () => import('../views/AppointManaView')
   },
   {
+    path: '/greenChannelManaView',
+    name: 'greenChannelManaView',
+    component: () => import('../views/GreenChannelManaView')
+  },
+  {
     path: '/resetPassword',
     name: 'resetPassword',
     component: () => import('../views/ResetPassword')

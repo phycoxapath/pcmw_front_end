@@ -53,6 +53,7 @@ export default {
       hospDescription: "",
       address:"",
       isAmbulance:"",
+      isProcessing:false,
       submitRegistry:{
         appointAppendix:"",
       },
@@ -72,34 +73,44 @@ export default {
   },
   methods:{
     onSubmit(){
-      axios("http://localhost/users/getById?id="+window.localStorage.getItem('id')).then(res=>{
-        if (this.isAmbulance === '是'){
-          this.appointmentDTO.appointAppendix = this.submitRegistry.appointAppendix + '(需要救护车，接诊地址为：'+(this.address === '' ? res.data.address : this.address)+')'
-        }else {
-          this.appointmentDTO.appointAppendix = this.submitRegistry.appointAppendix
+      if (this.isProcessing){
+        ElMessage.error("您目前的绿色通道预约尚未处理完毕，请不要重复申请！")
+        return
+      }
+      this.$refs.submitRegistry.validate(isValid => {
+        if (isValid){
+          axios("http://localhost/users/getById?id="+window.localStorage.getItem('id')).then(res=>{
+            if (this.isAmbulance === '是'){
+              this.appointmentDTO.appointAppendix = this.submitRegistry.appointAppendix + '(需要救护车，接诊地址为：'+(this.address === '' ? res.data.address : this.address)+')'
+            }else {
+              this.appointmentDTO.appointAppendix = this.submitRegistry.appointAppendix
+            }
+            this.appointmentDTO.initiatorId = res.data.id
+            this.appointmentDTO.handlerId = this.hospId
+            axios.post("http://localhost/appointments/saveAppointment",this.appointmentDTO).then(subRes=>{
+              if (subRes.data === 'save success') {
+                ElMessage.success("预约成功，院方将迅速处理，您可前往个人中心/我的预约查看受理响应情况")
+                this.address = ""
+                this.isAmbulance = ""
+                this.submitRegistry.appointAppendix = ""
+              }else {
+                ElMessage.error("系统繁忙，请稍后再试！")
+              }
+            }).catch(err=>{
+              if (err.response) {
+                // 请求已发出，但服务器响应的状态码不在 2xx 范围内
+                console.log(err.response.data);
+                console.log(err.response.status);
+                console.log(err.response.headers);
+              } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error', err.message);
+              }
+              console.log(err.config);
+            })
+          })
         }
-        this.appointmentDTO.initiatorId = res.data.id
-        this.appointmentDTO.handlerId = this.hospId
-        axios.post("http://localhost/appointments/saveAppointment",this.appointmentDTO).then(subRes=>{
-          if (subRes.data === 'save success') {
-            ElMessage.success("预约成功，院方将迅速处理，您可前往个人中心/我的预约查看受理响应情况")
-          }else {
-            ElMessage.error("系统繁忙，请稍后再试！")
-          }
-        }).catch(err=>{
-          if (err.response) {
-            // 请求已发出，但服务器响应的状态码不在 2xx 范围内
-            console.log(err.response.data);
-            console.log(err.response.status);
-            console.log(err.response.headers);
-          } else {
-            // Something happened in setting up the request that triggered an Error
-            console.log('Error', err.message);
-          }
-          console.log(err.config);
-        })
       })
-
     },
   },
   watch:{
@@ -124,6 +135,19 @@ export default {
         }
         console.log(err.config);
       })
+    },
+    'submitRegistry.appointAppendix' :{
+      handler(val,oldVal){
+        if (val === '' && oldVal !== ''){
+          axios.get("http://localhost/appointments/getValidByInitiatorIdAndType?initiatorId="+window.localStorage.getItem('id')+"&type=绿色通道").then(res=>{
+            console.log(res.data)
+            if (res.data.length === 0){
+              this.isProcessing = false
+            }
+            else this.isProcessing = res.data[res.data.length - 1] !== '已完成';
+          })
+        }
+      }
     }
   },
   mounted() {
@@ -142,6 +166,13 @@ export default {
         console.log('Error', err.message);
       }
       console.log(err.config);
+    })
+    axios.get("http://localhost/appointments/getValidByInitiatorIdAndType?initiatorId="+window.localStorage.getItem('id')+"&type=绿色通道").then(res=>{
+      console.log(res.data)
+      if (res.data.length === 0){
+        this.isProcessing = false
+      }
+      else this.isProcessing = res.data[res.data.length - 1] !== '已完成';
     })
   }
 }
