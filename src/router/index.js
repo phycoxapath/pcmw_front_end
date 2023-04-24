@@ -38,11 +38,11 @@ const routes = [
       },
       {
         path: 'defaultRegistry',
-        component: () => import('../components/MedicalServiceComponent/DefaultRegistry'),
+        component: () => import('../components/MedicalServiceComponents/DefaultRegistry'),
       },
       {
         path: 'greenChannelRegistry',
-        component: () => import('../components/MedicalServiceComponent/GreenChannelRegistry'),
+        component: () => import('../components/MedicalServiceComponents/GreenChannelRegistry'),
       },
     ]
   },
@@ -93,6 +93,29 @@ const routes = [
     path: '/appointManaView',
     name: 'appointManaView',
     component: () => import('../views/AppointManaView')
+  },
+  {
+    path: '/hospitalVaccineMana',
+    redirect: '/hospitalVaccineMana/addNewVaccine',
+  },
+  {
+    path: '/hospitalVaccineMana',
+    name: 'hospitalVaccineMana',
+    component: () => import('../views/HospitalVaccineMana'),
+    children: [
+      {
+        path: 'addNewVaccine',
+        component: () => import('../components/HospitalVaccineComponents/AddNewVaccine'),
+      },
+      {
+        path: 'modifyVaccine',
+        component: () => import('../components/HospitalVaccineComponents/ModifyVaccine'),
+      },
+      {
+        path: 'vaccineAppointmentMana',
+        component: () => import('../components/HospitalVaccineComponents/VaccineAppointmentMana'),
+      },
+    ]
   },
   {
     path: '/greenChannelManaView',

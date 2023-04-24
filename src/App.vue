@@ -13,7 +13,7 @@
   <el-menu-item index="/greenChannelManaView" class="menu-style" v-show="this.loginRole==='hospitals'">绿色通道受理</el-menu-item>
   <el-menu-item index="/medicalService" class="menu-style" v-show="!this.loginState||this.loginRole==='users'">医疗业务</el-menu-item>
     <el-menu-item index="/appointManaView" class="menu-style" v-show="this.loginRole==='doctors'">预约管理</el-menu-item>
-    <el-menu-item index="2" class="menu-style">疫苗管理</el-menu-item>
+    <el-menu-item index="/hospitalVaccineMana" class="menu-style" v-show="this.loginRole==='hospitals'">疫苗管理</el-menu-item>
   <el-menu-item index="3" class="menu-style">商城入口</el-menu-item>
   <div class="flex-grow" />
   <el-menu-item index="/login" style="color: #409EFF;" v-show="!loginState">登录</el-menu-item>
