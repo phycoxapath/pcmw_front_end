@@ -1,15 +1,15 @@
 <template>
-  <el-form :model="submitNewVaccine" label-width="140px" class="demo-border"
+  <el-form :model="submitNewVaccine" label-width="150px" class="demo-border"
            :rules="rules"
            ref="submitNewVaccine"
   >
-    <el-form-item label="请选择疫苗名称：">
-      <el-select @change="vaccineNameOnChange" v-model="submitNewVaccine.vaccineName" placeholder="请选择疫苗名称" style="width: 330px">
+    <el-form-item label="请选择疫苗名称：" prop="vaccineName">
+      <el-select allow-create filterable @change="vaccineNameOnChange" v-model="submitNewVaccine.vaccineName" placeholder="选择疫苗名称或输入疫苗名称新建" style="width: 330px">
         <el-option v-for="(item,index) in vaccineOption" :key="index" :label="item.label" :value="item.value"></el-option>
       </el-select>
     </el-form-item>
-    <el-form-item label="研发公司：" v-show="submitNewVaccine.vaccineName">
-      <el-input disabled v-model="submitNewVaccine.prepareCompany" :model-value="companies[optionIndex]"></el-input>
+    <el-form-item label="研发公司：" v-show="submitNewVaccine.vaccineName" prop="prepareCompany">
+      <el-input :disabled="optionIndex >= 0" placeholder="请输入研发公司" v-model="submitNewVaccine.prepareCompany" ></el-input>
     </el-form-item>
     <el-form-item label="添加疫苗详细说明：" prop="vaccineDescription">
       <el-input type="textarea" :rows="6" v-model="submitNewVaccine.vaccineDescription"></el-input>
@@ -18,12 +18,15 @@
       <el-input-number :precision="2" controls-position="right" :step="5" v-model="submitNewVaccine.vaccinePrice" min="0"></el-input-number>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="onSubmit">新增</el-button>
+      <el-button type="primary" @click="onSubmit" style="margin-left: 400px">新增</el-button>
     </el-form-item>
   </el-form>
 </template>
 
 <script>
+import axios from "axios";
+import {ElMessage} from "element-plus";
+
 export default {
   name: "AddNewVaccine",
   data(){
@@ -33,9 +36,18 @@ export default {
         prepareCompany:"",
         vaccineDescription:"",
         vaccinePrice:0,
+        hospId:"",
       },
       rules:{
-
+        vaccineDescription:[
+          { required: true, message: '请输入疫苗详细说明！', trigger: 'blur' },
+        ],
+        vaccineName:[
+          { required: true, message: '请选择疫苗名称！', trigger: 'blur' },
+        ],
+        prepareCompany:[
+          { required: true, message: '请输入研发公司名称！', trigger: 'blur' }
+        ]
       },
       vaccineOption:[
         {label:"克尔来福（CoronaVac）",value:"克尔来福（CoronaVac）"},
@@ -53,16 +65,51 @@ export default {
       for (let i = 0; i < this.vaccineOption.length; i++) {
         if (val === this.vaccineOption[i].label){
           this.optionIndex = i
+          this.submitNewVaccine.prepareCompany = this.companies[i]
           break
+        }
+        if (i === this.vaccineOption.length-1) {
+          this.optionIndex = -1
         }
       }
     },
     onSubmit(){
-      this.$refs.submitNewVaccine.validate(isValid => {
-        if (isValid){
-
+      axios.get("http://localhost/vaccines/getByHospId?hospId="+window.localStorage.getItem('id')).then(queryRes=>{
+        for (let i = 0; i < queryRes.data.length; i++) {
+          if (this.submitNewVaccine.vaccineName === queryRes.data[i].vaccineName){
+            ElMessage.error("请不要重复添加相同疫苗！")
+            return
+          }
         }
+        this.$refs.submitNewVaccine.validate(isValid => {
+          if (isValid){
+            this.submitNewVaccine.hospId = window.localStorage.getItem('id')
+            axios.post("http://localhost/vaccines/saveVaccine",this.submitNewVaccine).then(res=>{
+              if (res.data === 'save success'){
+                ElMessage.success("新增成功！")
+                this.submitNewVaccine.vaccineName = ''
+                this.submitNewVaccine.vaccineDescription = ''
+                this.submitNewVaccine.vaccinePrice = 0
+              }else {
+                ElMessage.error("系统繁忙，请稍后再试！")
+              }
+            }).catch(err=>{
+              if (err.response) {
+                // 请求已发出，但服务器响应的状态码不在 2xx 范围内
+                console.log(err.response.data);
+                console.log(err.response.status);
+                console.log(err.response.headers);
+              } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error', err.message);
+              }
+              console.log(err.config);
+              ElMessage.error("系统繁忙，请稍后再试！")
+            })
+          }
+        })
       })
+
     },
   },
   mounted() {
@@ -81,5 +128,8 @@ export default {
   width: 600px;
   padding: 25px;
   background-color: #FAFAFA;
+  position: fixed;
+  margin-left: 500px;
+  margin-top: 100px;
 }
 </style>

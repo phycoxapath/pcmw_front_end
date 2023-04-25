@@ -123,6 +123,11 @@ const routes = [
     component: () => import('../views/GreenChannelManaView')
   },
   {
+    path: '/vaccineAppoint',
+    name: 'vaccineAppoint',
+    component: () => import('../views/VaccineAppoint')
+  },
+  {
     path: '/resetPassword',
     name: 'resetPassword',
     component: () => import('../views/ResetPassword')

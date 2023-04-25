@@ -15,8 +15,8 @@
       <el-input v-model="newValue" type="textarea" rows="5" :placeholder="attr" v-if="index === lineIndex && index==='医院简介'"></el-input>
       <!--      <el-input v-model="newAge" v-if="index ==='年龄'"></el-input>-->
       <!--      <el-input v-model="newAddr" v-if="index ==='收货地址'"></el-input>-->
-      <el-button @click="modify(index)" v-if="attr !== '' &&attr!== null && index!=='id' && index!== '是否取得资质' && index!== '资质类型' && index!==lineIndex" type="primary" color=" #ecf5ff" ><el-icon><Edit/></el-icon>修改</el-button>
-      <el-button @click="modify(index)" v-else-if="index!=='id' && index!== '是否取得资质' && index!== '资质类型' && index !== lineIndex" type="primary" color=" #ecf5ff" ><el-icon><Edit/></el-icon>添加</el-button>
+      <el-link style="margin-left: 7px"  :underline="false" @click="modify(index)" v-if="attr !== '' &&attr!== null && index!=='id' && index!== '是否取得资质' && index!== '资质类型' && index!==lineIndex" type="primary" color=" #ecf5ff" ><el-icon size="18px"><Edit/></el-icon></el-link>
+      <el-link style="margin-left: 7px"  :underline="false" @click="modify(index)" v-else-if="index!=='id' && index!== '是否取得资质' && index!== '资质类型' && index !== lineIndex" type="primary" color=" #ecf5ff" ><el-icon size="18px"><CirclePlus /></el-icon></el-link>
       <el-button @click="save(index,newValue)" type="primary" color=" #ecf5ff" v-show="index === lineIndex">保存</el-button>
       <el-button @click="cancel" type="primary" color=" #ecf5ff" v-show="index === lineIndex">取消</el-button>
     </el-descriptions-item>
