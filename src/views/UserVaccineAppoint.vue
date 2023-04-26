@@ -14,6 +14,10 @@
     </el-menu-item>
     <el-menu-item index="/hospitalVaccineMana/modifyVaccine">
       <el-icon><Edit /></el-icon>
+      <span>预约记录</span>
+    </el-menu-item>
+    <el-menu-item index="/hospitalVaccineMana/modifyVaccine">
+      <el-icon><Edit /></el-icon>
       <span>接种记录</span>
     </el-menu-item>
   </el-menu>

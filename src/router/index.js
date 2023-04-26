@@ -123,9 +123,19 @@ const routes = [
     component: () => import('../views/GreenChannelManaView')
   },
   {
-    path: '/vaccineAppoint',
-    name: 'vaccineAppoint',
-    component: () => import('../views/VaccineAppoint')
+    path: "/userVaccineAppoint",
+    redirect: "/userVaccineAppoint/vaccineAppoint",
+  },
+  {
+    path: '/userVaccineAppoint',
+    name: 'userVaccineAppoint',
+    component: () => import('../views/UserVaccineAppoint'),
+    children: [
+      {
+        path: 'vaccineAppoint',
+        component: () => import('../components/UserVaccineAppointComponents/VaccineAppoint'),
+      }
+    ],
   },
   {
     path: '/resetPassword',

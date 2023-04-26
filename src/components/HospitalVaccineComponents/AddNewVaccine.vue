@@ -14,6 +14,17 @@
     <el-form-item label="添加疫苗详细说明：" prop="vaccineDescription">
       <el-input type="textarea" :rows="6" v-model="submitNewVaccine.vaccineDescription"></el-input>
     </el-form-item>
+    <el-form-item label="选择每周接种时间：" prop="vaccinateDay">
+      <el-checkbox-group v-model="vaccinateDay" >
+        <el-checkbox-button label="周一"/>
+        <el-checkbox-button label="周二"/>
+        <el-checkbox-button label="周三"/>
+        <el-checkbox-button label="周四"/>
+        <el-checkbox-button label="周五"/>
+        <el-checkbox-button label="周六"/>
+        <el-checkbox-button label="周日"/>
+      </el-checkbox-group>
+    </el-form-item>
     <el-form-item label="设定接种价格：">
       <el-input-number :precision="2" controls-position="right" :step="5" v-model="submitNewVaccine.vaccinePrice" min="0"></el-input-number>
     </el-form-item>
@@ -31,10 +42,12 @@ export default {
   name: "AddNewVaccine",
   data(){
     return{
+      vaccinateDay:[],
       submitNewVaccine:{
         vaccineName:"",
         prepareCompany:"",
         vaccineDescription:"",
+        vaccinateDay:0,
         vaccinePrice:0,
         hospId:"",
       },
@@ -43,6 +56,9 @@ export default {
           { required: true, message: '请输入疫苗详细说明！', trigger: 'blur' },
         ],
         vaccineName:[
+          { required: true, message: '请选择疫苗名称！', trigger: 'blur' },
+        ],
+        vaccinateDay:[
           { required: true, message: '请选择疫苗名称！', trigger: 'blur' },
         ],
         prepareCompany:[
@@ -74,6 +90,10 @@ export default {
       }
     },
     onSubmit(){
+      if (this.vaccinateDay.length === 0){
+        ElMessage.error("请绑定至少一天为接种时间！")
+        return
+      }
       axios.get("http://localhost/vaccines/getByHospId?hospId="+window.localStorage.getItem('id')).then(queryRes=>{
         for (let i = 0; i < queryRes.data.length; i++) {
           if (this.submitNewVaccine.vaccineName === queryRes.data[i].vaccineName){
@@ -83,6 +103,38 @@ export default {
         }
         this.$refs.submitNewVaccine.validate(isValid => {
           if (isValid){
+            for (let i = 0; i < this.vaccinateDay.length; i++) {
+              switch (this.vaccinateDay[i]){
+                case '周一':{
+                  this.submitNewVaccine.vaccinateDay |= 64
+                  break
+                }
+                case '周二':{
+                  this.submitNewVaccine.vaccinateDay |= 32
+                  break
+                }
+                case '周三':{
+                  this.submitNewVaccine.vaccinateDay |= 16
+                  break
+                }
+                case '周四':{
+                  this.submitNewVaccine.vaccinateDay |= 8
+                  break
+                }
+                case '周五':{
+                  this.submitNewVaccine.vaccinateDay |= 4
+                  break
+                }
+                case '周六':{
+                  this.submitNewVaccine.vaccinateDay |= 2
+                  break
+                }
+                case '周日':{
+                  this.submitNewVaccine.vaccinateDay |= 1
+                  break
+                }
+              }
+            }
             this.submitNewVaccine.hospId = window.localStorage.getItem('id')
             axios.post("http://localhost/vaccines/saveVaccine",this.submitNewVaccine).then(res=>{
               if (res.data === 'save success'){
@@ -90,6 +142,7 @@ export default {
                 this.submitNewVaccine.vaccineName = ''
                 this.submitNewVaccine.vaccineDescription = ''
                 this.submitNewVaccine.vaccinePrice = 0
+                this.vaccinateDay.splice(0,this.vaccinateDay.length)
               }else {
                 ElMessage.error("系统繁忙，请稍后再试！")
               }
@@ -111,6 +164,7 @@ export default {
       })
 
     },
+
   },
   mounted() {
 
