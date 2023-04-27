@@ -134,7 +134,11 @@ const routes = [
       {
         path: 'vaccineAppoint',
         component: () => import('../components/UserVaccineAppointComponents/VaccineAppoint'),
-      }
+      },
+      {
+        path: 'appointHistory',
+        component: () => import('../components/UserVaccineAppointComponents/AppointHistory'),
+      },
     ],
   },
   {

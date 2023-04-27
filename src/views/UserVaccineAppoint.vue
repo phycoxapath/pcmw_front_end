@@ -8,11 +8,11 @@
       text-color="#303133"
       :router="true"
   >
-    <el-menu-item index="/hospitalVaccineMana/addNewVaccine">
+    <el-menu-item index="/userVaccineAppoint/vaccineAppoint">
       <el-icon><Plus /></el-icon>
       <span>疫苗接种预约</span>
     </el-menu-item>
-    <el-menu-item index="/hospitalVaccineMana/modifyVaccine">
+    <el-menu-item index="/userVaccineAppoint/appointHistory">
       <el-icon><Edit /></el-icon>
       <span>预约记录</span>
     </el-menu-item>
