@@ -1,6 +1,5 @@
 
   <template>
-
     <div class="common-layout">
       <el-container>
         <el-header>
@@ -11,6 +10,7 @@
         <el-main>
           <div>
             <el-text class="mx-1" size="large" style="font-size: 30px;position: relative;left: 700px;bottom: 20px">登 录</el-text>
+            <div class="adminEntrance"><el-link :underline=false  style="font-weight: bold;font-size: 16px;" @click="this.$router.push('/administratorLogin')">管理员登录</el-link></div>
               <el-form :model="form" label-width="120px" class="demo-border"
                 :rules="rules"
                 ref="form"
@@ -160,5 +160,11 @@ export default {
   position: relative;
   left: 264px;
   top: 20px;
+}
+.adminEntrance{
+  margin-left: 980px;
+  margin-right: 429px;
+  margin-bottom: 5px;
+  background-color: #FAFAFA;
 }
 </style>

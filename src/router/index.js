@@ -145,7 +145,17 @@ const routes = [
     path: '/resetPassword',
     name: 'resetPassword',
     component: () => import('../views/ResetPassword')
-  }
+  },
+  {
+    path: '/administratorLogin',
+    name: 'administratorLogin',
+    component: () => import('../views/AdminViews/AdministratorLogin')
+  },
+  {
+    path: '/adminHome',
+    name: 'adminHome',
+    component: () => import('../views/AdminViews/AdminHome')
+  },
 
 ]
 

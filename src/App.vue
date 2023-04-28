@@ -56,6 +56,7 @@ export default {
   mounted() {
     this.loginState = window.localStorage.getItem('loginState')
     this.loginRole = window.localStorage.getItem('loginRole')
+
   }
 }
 </script>

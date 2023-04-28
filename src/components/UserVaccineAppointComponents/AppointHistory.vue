@@ -1,12 +1,13 @@
 <template>
 <div style="position: fixed;left: 340px;top: 100px">
+  <el-text style="font-size: 20px;font-weight: bold">我的预约</el-text>
   <el-table :data="vaccineAppointData" style="width: 1000px;background-color: #FAFAFA;border:2px solid #c8c9cc;margin-top: 20px" height="500">
     <el-table-column label="序号" width="100px" prop="rowId" />
     <el-table-column label="预约类型"  prop="appointType" />
     <el-table-column label="接种地点"  prop="handlerName" />
     <el-table-column label="疫苗名称"  prop="vaccineName" />
     <el-table-column label="操作时间" sortable prop="operateTime" />
-    <el-table-column label="接种时间" sortable prop="appointTime" />
+    <el-table-column label="接种时间" sortable prop="appointTime" :filter-method="appointTimeHandler" :filters="[{text:'未赴约',value:true},{text:'已过期',value:false}]" />
   </el-table>
 </div>
 </template>
@@ -23,7 +24,9 @@ export default {
     }
   },
   methods:{
-
+    appointTimeHandler(value,row){
+      return ((new Date(this.vaccineAppointments[row.rowId-1].appointTime) > new Date()) && value) || ((new Date(this.vaccineAppointments[row.rowId-1].appointTime) < new Date()) && !value)
+    }
   },
   mounted() {
     Date.prototype.toLocaleString = function (){
