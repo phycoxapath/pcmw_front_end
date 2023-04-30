@@ -154,7 +154,17 @@ const routes = [
   {
     path: '/adminHome',
     name: 'adminHome',
-    component: () => import('../views/AdminViews/AdminHome')
+    component: () => import('../views/AdminViews/AdminHome'),
+    children: [
+      {
+        path: '/hospitalMana',
+        component: () => import('../components/AdministratorService/HospitalMana'),
+      },
+      {
+        path: '/userMana',
+        component: () => import('../components/AdministratorService/UserMana'),
+      },
+    ]
   },
 
 ]

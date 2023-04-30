@@ -1,7 +1,24 @@
 <template>
+  <router-view></router-view>
+  <el-menu
+      active-text-color="#337ecc"
+      default-active="1"
+      background-color="#FAFCFF"
+      class="el-menu-vertical-demo"
+      text-color="#303133"
+      :router="true"
+  >
+    <el-menu-item index="/userVaccineAppoint/vaccineAppoint">
+      <el-icon><Plus /></el-icon>
+      <span>医院管理</span>
+    </el-menu-item>
+    <el-menu-item index="/userVaccineAppoint/appointHistory">
+      <el-icon><Edit /></el-icon>
+      <span>用户管理</span>
+    </el-menu-item>
+  </el-menu>
   <div>
     <h1>admin home</h1>
-    <span>{{}}</span>
     <el-button size="large" @click="getAllHospitals">查询医院</el-button>
   </div>
 
@@ -57,5 +74,9 @@ export default {
 </script>
 
 <style scoped>
-
+.el-menu-vertical-demo{
+  position: fixed;
+  width: 200px;
+  height: 700px;
+}
 </style>

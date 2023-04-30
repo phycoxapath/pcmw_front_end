@@ -52,9 +52,11 @@ export default {
       axios.post("http://localhost/admins/loginValidate",this.adminLoginForm).then(res=>{
         if (res.data === "login success"){
           ElMessage.success("登录成功！即将跳转到首页...")
+          window.localStorage.setItem("loginRole","admin")
+          window.localStorage.setItem("loginState","pcmwSysAdmin")
           setTimeout( ()=>{
-            this.$router.push('/adminHome')
-          },800)
+            window.location.href = 'http://localhost:8080/'
+          },1000)
         }
       })
     }

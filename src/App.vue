@@ -9,7 +9,8 @@
     active-text-color="#337ecc"
     @select="handleSelect"
 >
-  <el-menu-item index="/" style="width: 150px">首页</el-menu-item>
+  <el-menu-item index="/" style="width: 150px" >首页</el-menu-item>
+  <el-menu-item index="/adminHome" class="menu-style"  v-show="loginRole === 'admin'">管理员业务</el-menu-item>
   <el-menu-item index="/greenChannelManaView" class="menu-style" v-show="this.loginRole==='hospitals'">绿色通道受理</el-menu-item>
   <el-menu-item index="/medicalService" class="menu-style" v-show="!this.loginState||this.loginRole==='users'">医疗业务</el-menu-item>
   <el-menu-item index="/userVaccineAppoint" class="menu-style" v-show="!this.loginState||this.loginRole==='users'">疫苗预约</el-menu-item>
@@ -19,9 +20,13 @@
   <div class="flex-grow" />
   <el-menu-item index="/login" style="color: #409EFF;" v-show="!loginState">登录</el-menu-item>
   <el-menu-item index="/register" style="color: #409EFF;" v-show="!loginState">注册</el-menu-item>
-  <el-sub-menu index="userConfig" style="color: #409EFF" v-show="loginState">
+  <el-sub-menu index="userConfig" style="color: #409EFF" v-show="loginState && loginRole !== 'admin'">
     <template #title>您好，{{ loginState }}</template>
     <el-menu-item index="/personalCenter"><el-icon><User /></el-icon> 个人中心</el-menu-item>
+    <el-menu-item index="exitLogin"><el-icon><CloseBold /></el-icon> 退出登录</el-menu-item>
+  </el-sub-menu>
+  <el-sub-menu index="adminConfig" style="color: #409EFF" v-show="loginState && loginRole === 'admin'">
+    <template #title>您好，{{ loginState }}</template>
     <el-menu-item index="exitLogin"><el-icon><CloseBold /></el-icon> 退出登录</el-menu-item>
   </el-sub-menu>
 
@@ -42,15 +47,21 @@ export default {
   },
   methods:{
     handleSelect(key){
-      if (key === 'exitLogin'){
+      console.log(key)
+      if (key === 'exitLogin' && this.loginRole !== 'admin'){
         if (window.localStorage.getItem('loginState')) {
           window.localStorage.removeItem('loginState')
           window.localStorage.removeItem('loginRole')
           window.localStorage.removeItem('id')
           window.location.href = "http://localhost:8080/"
         }
-
+      }else if (key === 'exitLogin' && this.loginRole === 'admin') {
+        window.localStorage.removeItem('loginState')
+        window.localStorage.removeItem('loginRole')
+        window.localStorage.removeItem('jwt')
+        window.location.href = "http://localhost:8080/"
       }
+
     }
   },
   mounted() {
