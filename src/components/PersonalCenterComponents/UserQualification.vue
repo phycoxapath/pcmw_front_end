@@ -227,11 +227,12 @@ export default {
       }else if (this.loginRole === 'users'){
         this.applyData.applyType = '免挂号绿色通道预约资质申请'
         this.applyData.initiatorId = this.extraData.id
+        this.applyData.handlerId = window.localStorage.getItem('adminId')
         //admin id
       }else if (this.loginRole === 'hospitals'){
         this.applyData.applyType = '机构资质认证申请'
         this.applyData.initiatorId = this.extraData.id
-        //admin id
+        this.applyData.handlerId = window.localStorage.getItem('adminId')
       }
     })
     axios.get("http://localhost/apply/getByInitiatorId?id="+window.localStorage.getItem('id')+"&role="+window.localStorage.getItem('loginRole')).then(res=>{

@@ -157,11 +157,11 @@ const routes = [
     component: () => import('../views/AdminViews/AdminHome'),
     children: [
       {
-        path: '/hospitalMana',
+        path: 'hospitalMana',
         component: () => import('../components/AdministratorService/HospitalMana'),
       },
       {
-        path: '/userMana',
+        path: 'userMana',
         component: () => import('../components/AdministratorService/UserMana'),
       },
     ]

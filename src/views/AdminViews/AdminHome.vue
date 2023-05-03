@@ -8,19 +8,16 @@
       text-color="#303133"
       :router="true"
   >
-    <el-menu-item index="/userVaccineAppoint/vaccineAppoint">
+    <el-menu-item index="/adminHome/hospitalMana">
       <el-icon><Plus /></el-icon>
       <span>医院管理</span>
     </el-menu-item>
-    <el-menu-item index="/userVaccineAppoint/appointHistory">
+    <el-menu-item index="/adminHome/userMana">
       <el-icon><Edit /></el-icon>
       <span>用户管理</span>
     </el-menu-item>
   </el-menu>
-  <div>
-    <h1>admin home</h1>
-    <el-button size="large" @click="getAllHospitals">查询医院</el-button>
-  </div>
+
 
 
   <el-dialog
@@ -68,6 +65,8 @@ export default {
   mounted() {
     if (!window.localStorage.getItem('jwt')){
       this.loginPrompt= true
+    }else {
+      window.localStorage.setItem('adminId',4)
     }
   }
 }
