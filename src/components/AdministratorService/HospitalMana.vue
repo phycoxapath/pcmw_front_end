@@ -53,13 +53,13 @@
       />
     </el-tab-pane>
     <el-tab-pane label="资质审核">
-      <el-table :data="applyData" style="width: 1300px;background-color: #FAFAFA" height="500" >
-        <el-table-column label="id" prop="id" />
-        <el-table-column label="处理情况" prop="applyState" />
-        <el-table-column label="申请者名称" prop="initiatorName" />
+      <el-table :data="applyData" style="width: 1000px;background-color: #FAFAFA" height="500" >
+        <el-table-column label="序号" width="100px" prop="rowId" />
+        <el-table-column label="处理情况" width="120px" prop="applyState" />
+        <el-table-column label="申请者名称" width="180px" prop="initiatorName" />
         <el-table-column label="申请类型" prop="applyType" />
         <el-table-column label="申请时间" prop="applyTime" />
-        <el-table-column label="操作" prop="handle" >
+        <el-table-column label="操作" width="230px" prop="handle" >
           <template #default="scope">
             <el-button size="small" @click="showDetails(scope.$index, scope.row)"
             >查看详细</el-button
@@ -79,6 +79,22 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-dialog v-model="handledApplyDialog" title="已处理申请" draggable width="1300px">
+        <el-table :data="handledData" style="width: 1300px;background-color: #FAFAFA" height="500" >
+          <el-table-column label="序号" prop="rowId" />
+          <el-table-column label="处理情况" prop="applyState" />
+          <el-table-column label="申请者名称" prop="initiatorName" />
+          <el-table-column label="申请类型" prop="applyType" />
+          <el-table-column label="申请时间" prop="applyTime" />
+          <el-table-column label="处理时间" prop="handleTime" />
+          <el-table-column label="处理者" prop="handlerName" />
+          <el-table-column label="操作" prop="handle" >
+            <template #default="scope">
+              <el-button size="small" @click="reHandle(scope.$index,scope.row)">重审</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-dialog>
     </el-tab-pane>
   </el-tabs>
 </template>
@@ -93,10 +109,13 @@ export default {
     return{
       description:"",
       selectedHospital:"",
+      handledApplyDialog:false,
       verifiedHospitalData:[],
       verifiedHospitals:[],
       applyData:[],
-      applies:[],
+      applications:[],
+      handledData:[],
+      handledApplications:[],
       options:[],
       pageSize:10,
       currentPage:1,
@@ -162,6 +181,62 @@ export default {
             hospitalDescription: this.verifiedHospitals[i].hospitalDescription,
           })
         }
+      }
+    })
+    axios.get("http://localhost/admins/getApplyByType?id="+window.localStorage.getItem('adminId')+"&type=机构资质认证申请").then(res=>{
+      Date.prototype.toLocaleString = function (){
+        let monthLessTen = this.getMonth() < 10 ? "0": ""
+        let dateLessTen = this.getDate() < 10 ? "0" : ""
+        let hourLessTen = this.getHours() < 10 ? "0" : ""
+        let minuteLessTen = this.getMinutes() < 10 ? "0" : ""
+        let secondLessTen = this.getSeconds() <10 ? "0" : ""
+
+        return (
+            this.getFullYear() +
+            "-" +monthLessTen+
+            (this.getMonth() + 1) +
+            "-" +dateLessTen+
+            this.getDate() +
+            " " +hourLessTen+
+            this.getHours() +
+            ":" +minuteLessTen+
+            this.getMinutes() +
+            ":" +secondLessTen+
+            this.getSeconds()
+
+        );
+      }
+      for (let i = 0; i < res.data.length; i++) {
+        let applyState = (res.data[i].applyState === '审核中') ? '待处理' : '已处理'
+        if (applyState === '待处理') {
+          this.applications.push(res.data[i])
+        }else {
+          this.handledApplications.push(res.data[i])
+        }
+      }
+
+
+      for (let i = 0; i < this.applications.length; i++) {
+        this.applications[i].applyTime = new Date(res.data[i].applyTime).toLocaleString()
+          this.applyData.push({
+            rowId: i+1,
+            applyState: '待处理',
+            initiatorName: this.applications[i].initiatorName,
+            applyType: this.applications[i].applyType,
+            applyTime: this.applications[i].applyTime
+          })
+      }
+      for (let i = 0; i < this.handledApplications.length; i++) {
+        this.handledApplications[i].applyTime = new Date(res.data[i].applyTime).toLocaleString()
+        this.handledData.push({
+          rowId: i+1,
+          applyState: this.handledApplications[i].applyState,
+          initiatorName: this.handledApplications[i].initiatorName,
+          applyType: this.handledApplications[i].applyType,
+          applyTime: this.handledApplications[i].applyTime,
+          handleTime: this.handledApplications[i].handleTime,
+          handlerName: this.handledApplications[i].handlerName
+        })
       }
     })
   }
