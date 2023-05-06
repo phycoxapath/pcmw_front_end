@@ -61,24 +61,33 @@
         <el-table-column label="申请时间" prop="applyTime" />
         <el-table-column label="操作" width="230px" prop="handle" >
           <template #default="scope">
-            <el-button size="small" @click="showDetails(scope.$index, scope.row)"
+            <el-button size="small" @click="showDetails(scope.row.rowId-1, scope.row)"
             >查看详细</el-button
             >
             <el-button
                 size="small"
                 type="success"
-                @click="passQual(scope.$index, scope.row)"
+                @click="passQual(scope.row.rowId-1, scope.$index)"
             >通过</el-button
             >
             <el-button
                 size="small"
                 type="danger"
-                @click="rejectQual(scope.$index, scope.row)"
+                @click="rejectQual(scope.row.rowId-1, scope.$index)"
             >驳回</el-button
             >
           </template>
         </el-table-column>
       </el-table>
+      <el-button type="primary" size="large" style="float: right" @click="handledApplyDialog = true">查看已处理申请</el-button>
+      <el-dialog v-model="detailImgDialog" title="详细信息" draggable>
+        <el-image v-for="src in imgSrc" :src=src :preview-src-list="imgPreview"></el-image>
+        <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="detailImgDialog = false">关闭</el-button>
+      </span>
+        </template>
+      </el-dialog>
       <el-dialog v-model="handledApplyDialog" title="已处理申请" draggable width="1300px">
         <el-table :data="handledData" style="width: 1300px;background-color: #FAFAFA" height="500" >
           <el-table-column label="序号" prop="rowId" />
@@ -110,6 +119,10 @@ export default {
       description:"",
       selectedHospital:"",
       handledApplyDialog:false,
+      detailImgDialog:false,
+      applyDTO:{},
+      imgSrc:[""],
+      imgPreview:[""],
       verifiedHospitalData:[],
       verifiedHospitals:[],
       applyData:[],
@@ -165,6 +178,90 @@ export default {
         ElMessage.warning("尚未输入医院名称！")
       }
     },
+    showDetails(rowIndex,dynamicIndex){
+      let src = 'http://localhost/common/downloadImg?fileName='+this.applications[rowIndex].applyImage
+      this.imgSrc[0] = src
+      this.imgPreview[0] = src
+      this.detailImgDialog = true
+    },
+    passQual(rowIndex,dynamicIndex){
+      Date.prototype.toLocaleString = function (){
+        let monthLessTen = this.getMonth() < 10 ? "0": ""
+        let dateLessTen = this.getDate() < 10 ? "0" : ""
+        let hourLessTen = this.getHours() < 10 ? "0" : ""
+        let minuteLessTen = this.getMinutes() < 10 ? "0" : ""
+        let secondLessTen = this.getSeconds() <10 ? "0" : ""
+
+        return (
+            this.getFullYear() +
+            "-" +monthLessTen+
+            (this.getMonth() + 1) +
+            "-" +dateLessTen+
+            this.getDate() +
+            " " +hourLessTen+
+            this.getHours() +
+            ":" +minuteLessTen+
+            this.getMinutes() +
+            ":" +secondLessTen+
+            this.getSeconds()
+        );
+      }
+      this.applications[rowIndex].applyState = '已通过'
+      this.applications[rowIndex].handleTime = new Date().toLocaleString()
+      this.applyDTO.id = this.applications[rowIndex].id
+      this.applyDTO.applyState = '已通过'
+      this.applyDTO.handleTime = new Date().toLocaleString()
+      axios.put("http://localhost/apply/update",this.applyDTO).then(res=>{
+        if (res.data === 'update success') {
+          ElMessage.success("处理成功")
+          this.handledData.push(this.applications[rowIndex])
+          this.applyData.splice(dynamicIndex,1)
+          axios.put("http://localhost/admins/updateHospQual?hospId="+this.applications[rowIndex].initiatorId+"&qualification=true").then(res=>{
+            if (res.data !== 'update success')
+              ElMessage.error("系统繁忙，请稍后再试")
+          })
+        }
+        else
+          ElMessage.error("系统繁忙，请稍后再试！")
+      })
+    },
+    rejectQual(rowIndex,dynamicIndex){
+      Date.prototype.toLocaleString = function (){
+        let monthLessTen = this.getMonth() < 10 ? "0": ""
+        let dateLessTen = this.getDate() < 10 ? "0" : ""
+        let hourLessTen = this.getHours() < 10 ? "0" : ""
+        let minuteLessTen = this.getMinutes() < 10 ? "0" : ""
+        let secondLessTen = this.getSeconds() <10 ? "0" : ""
+
+        return (
+            this.getFullYear() +
+            "-" +monthLessTen+
+            (this.getMonth() + 1) +
+            "-" +dateLessTen+
+            this.getDate() +
+            " " +hourLessTen+
+            this.getHours() +
+            ":" +minuteLessTen+
+            this.getMinutes() +
+            ":" +secondLessTen+
+            this.getSeconds()
+        );
+      }
+      this.applications[rowIndex].applyState = '被驳回'
+      this.applications[rowIndex].handleTime = new Date().toLocaleString()
+      this.applyDTO.id = this.applications[rowIndex].id
+      this.applyDTO.applyState = '被驳回'
+      this.applyDTO.handleTime = new Date().toLocaleString()
+      axios.put("http://localhost/apply/update",this.applyDTO).then(res=>{
+        if (res.data === 'update success') {
+          ElMessage.success("处理成功")
+          this.handledData.push(this.applications[rowIndex])
+          this.applyData.splice(dynamicIndex,1)
+        }
+        else
+          ElMessage.error("系统繁忙，请稍后再试！")
+      })
+    }
   },
   mounted() {
     axios.get("http://localhost/admins/getAllHospitals").then(res=>{
@@ -206,6 +303,7 @@ export default {
 
         );
       }
+      console.log(res)
       for (let i = 0; i < res.data.length; i++) {
         let applyState = (res.data[i].applyState === '审核中') ? '待处理' : '已处理'
         if (applyState === '待处理') {
@@ -214,7 +312,6 @@ export default {
           this.handledApplications.push(res.data[i])
         }
       }
-
 
       for (let i = 0; i < this.applications.length; i++) {
         this.applications[i].applyTime = new Date(res.data[i].applyTime).toLocaleString()

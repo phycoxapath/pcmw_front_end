@@ -122,7 +122,6 @@ export default {
             this.getMinutes() +
             ":" +secondLessTen+
             this.getSeconds()
-
         );
       }
       this.applications[index].applyState = '已通过'

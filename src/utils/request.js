@@ -48,7 +48,6 @@ instance.interceptors.request.use(
 )
 instance.interceptors.response.use(
     response=>{
-        console.log(response.headers)
         if (response.headers['authorization']) {
             window.localStorage.setItem('jwt',response.headers['authorization'])
         }
