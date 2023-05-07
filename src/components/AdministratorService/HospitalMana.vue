@@ -88,18 +88,23 @@
       </span>
         </template>
       </el-dialog>
-      <el-dialog v-model="handledApplyDialog" title="已处理申请" draggable width="1300px">
+      <el-dialog v-model="handledApplyDialog" title="已处理申请" draggable width="1100px">
         <el-table :data="handledData" style="width: 1300px;background-color: #FAFAFA" height="500" >
-          <el-table-column label="序号" prop="rowId" />
-          <el-table-column label="处理情况" prop="applyState" />
+          <el-table-column label="序号" width="100px" prop="rowId" />
+          <el-table-column label="处理情况" width="120px" prop="applyState" />
           <el-table-column label="申请者名称" prop="initiatorName" />
           <el-table-column label="申请类型" prop="applyType" />
           <el-table-column label="申请时间" prop="applyTime" />
           <el-table-column label="处理时间" prop="handleTime" />
           <el-table-column label="处理者" prop="handlerName" />
-          <el-table-column label="操作" prop="handle" >
+          <el-table-column label="操作"  prop="handle" >
             <template #default="scope">
-              <el-button size="small" @click="reHandle(scope.$index,scope.row)">重审</el-button>
+              <el-button size="small" @click="reHandle(scope.row.rowId-1, scope.$index)">重审</el-button>
+              <el-popconfirm title="确定要删除该记录吗？" width="250px" @confirm="deleteHistory(scope.row.rowId-1, scope.$index)">
+                <template #reference>
+                  <el-button size="small" type="danger" >删除</el-button>
+                </template>
+              </el-popconfirm>
             </template>
           </el-table-column>
         </el-table>
@@ -214,11 +219,12 @@ export default {
       axios.put("http://localhost/apply/update",this.applyDTO).then(res=>{
         if (res.data === 'update success') {
           ElMessage.success("处理成功")
-          this.handledData.push(this.applications[rowIndex])
-          this.applyData.splice(dynamicIndex,1)
           axios.put("http://localhost/admins/updateHospQual?hospId="+this.applications[rowIndex].initiatorId+"&qualification=true").then(res=>{
             if (res.data !== 'update success')
               ElMessage.error("系统繁忙，请稍后再试")
+            else {
+              this.tableDataTrans(rowIndex, 'toHandled')
+            }
           })
         }
         else
@@ -255,12 +261,87 @@ export default {
       axios.put("http://localhost/apply/update",this.applyDTO).then(res=>{
         if (res.data === 'update success') {
           ElMessage.success("处理成功")
-          this.handledData.push(this.applications[rowIndex])
-          this.applyData.splice(dynamicIndex,1)
+          this.tableDataTrans(rowIndex, 'toHandled')
         }
         else
           ElMessage.error("系统繁忙，请稍后再试！")
       })
+    },
+    reHandle(rowIndex,dynamicIndex){
+      this.handledApplications[rowIndex].applyState = '审核中'
+      this.applyDTO.id = this.handledApplications[rowIndex].id
+      this.applyDTO.applyState = '审核中'
+      axios.put("http://localhost/apply/update",this.applyDTO).then(res=>{
+        if (res.data === 'update success') {
+          ElMessage.success("操作成功")
+          axios.put("http://localhost/admins/updateHospQual?hospId="+this.handledApplications[rowIndex].initiatorId+"&qualification=false").then(res=>{
+            if (res.data !== 'update success')
+              ElMessage.error("系统繁忙，请稍后再试")
+            else {
+              this.tableDataTrans(rowIndex, 'toUnHandle')
+            }
+          })
+        }
+        else
+          ElMessage.error("系统繁忙，请稍后再试！")
+      })
+    },
+    deleteHistory(rowIndex, dynamicIndex){
+      axios.delete("http://localhost/admins/deleteApplication?id="+this.handledApplications[rowIndex].id).then(res=>{
+        if (res.data === 'delete success') {
+          ElMessage.success("删除成功！")
+          this.handledApplications.splice(rowIndex, 1)
+          this.handledData.splice(0, this.handledData.length)
+          for (let i = 0; i < this.handledApplications.length; i++) {
+            this.handledApplications[i].applyTime = new Date(this.handledApplications[i].applyTime).toLocaleString()
+            this.handledData.push({
+              rowId: i + 1,
+              applyState: this.handledApplications[i].applyState,
+              initiatorName: this.handledApplications[i].initiatorName,
+              applyType: this.handledApplications[i].applyType,
+              applyTime: this.handledApplications[i].applyTime,
+              handleTime: this.handledApplications[i].handleTime,
+              handlerName: this.handledApplications[i].handlerName
+            })
+          }
+        }else {
+          ElMessage.error("系统繁忙，请稍后再试！")
+        }
+      })
+
+    },
+    tableDataTrans(rowIndex, direction){
+      if (direction === 'toHandled') {
+        this.handledApplications.push(this.applications[rowIndex])
+        this.applications.splice(rowIndex, 1)
+      }else if (direction === 'toUnHandle'){
+        this.applications.unshift(this.handledApplications[rowIndex])
+        this.handledApplications.splice(rowIndex, 1)
+      }
+      this.applyData.splice(0, this.applyData.length)
+      this.handledData.splice(0, this.handledData.length)
+      for (let i = 0; i < this.applications.length; i++) {
+        this.applications[i].applyTime = new Date(this.applications[i].applyTime).toLocaleString()
+        this.applyData.push({
+          rowId: i+1,
+          applyState: '待处理',
+          initiatorName: this.applications[i].initiatorName,
+          applyType: this.applications[i].applyType,
+          applyTime: this.applications[i].applyTime
+        })
+      }
+      for (let i = 0; i < this.handledApplications.length; i++) {
+        this.handledApplications[i].applyTime = new Date(this.handledApplications[i].applyTime).toLocaleString()
+        this.handledData.push({
+          rowId: i+1,
+          applyState: this.handledApplications[i].applyState,
+          initiatorName: this.handledApplications[i].initiatorName,
+          applyType: this.handledApplications[i].applyType,
+          applyTime: this.handledApplications[i].applyTime,
+          handleTime: this.handledApplications[i].handleTime,
+          handlerName: this.handledApplications[i].handlerName
+        })
+      }
     }
   },
   mounted() {
@@ -303,7 +384,6 @@ export default {
 
         );
       }
-      console.log(res)
       for (let i = 0; i < res.data.length; i++) {
         let applyState = (res.data[i].applyState === '审核中') ? '待处理' : '已处理'
         if (applyState === '待处理') {
@@ -314,7 +394,7 @@ export default {
       }
 
       for (let i = 0; i < this.applications.length; i++) {
-        this.applications[i].applyTime = new Date(res.data[i].applyTime).toLocaleString()
+        this.applications[i].applyTime = new Date(this.applications[i].applyTime).toLocaleString()
           this.applyData.push({
             rowId: i+1,
             applyState: '待处理',
@@ -324,7 +404,7 @@ export default {
           })
       }
       for (let i = 0; i < this.handledApplications.length; i++) {
-        this.handledApplications[i].applyTime = new Date(res.data[i].applyTime).toLocaleString()
+        this.handledApplications[i].applyTime = new Date(this.handledApplications[i].applyTime).toLocaleString()
         this.handledData.push({
           rowId: i+1,
           applyState: this.handledApplications[i].applyState,
