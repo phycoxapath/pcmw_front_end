@@ -24,8 +24,23 @@
 </template>
 
 <script>
+import axios from "axios";
+import {ElMessage} from "element-plus";
+
 export default {
-  name: "HospitalVaccineMana"
+  name: "HospitalVaccineMana",
+  mounted() {
+    axios.get("http://localhost/hospitals/getById?id="+window.localStorage.getItem('id')).then(res=>{
+      if (res.data.qualification){
+        this.isQualified = true
+      }else {
+        ElMessage.error("您尚未认证机构资质，请先申请认证资质！")
+        setTimeout( () =>{
+          window.location.href = 'http://localhost:8080/#/personalCenter/userQualification'
+        },1200)
+      }
+    })
+  }
 }
 </script>
 

@@ -160,7 +160,9 @@ export default {
         );
       }
       this.defaultData.splice(0,this.defaultData.length)
+      console.log(this.overdueAppointments)
       for (let i = 0; i < this.overdueAppointments.length; i++) {
+
         this.defaultData.push({
           rowId:i+1,
           appointType:this.overdueAppointments[i].appointType,
@@ -244,7 +246,7 @@ export default {
   },
   mounted() {
 
-    axios.get("http://localhost/appointments/getValidByInitiatorId?initiatorId="+window.localStorage.getItem('id')).then(res =>{
+    axios.get("http://localhost/appointments/getValidByInitiatorId?initiatorId="+window.localStorage.getItem('id')+"&type=普通预约").then(res =>{
       this.validAppointments = res.data
       Date.prototype.toLocaleString = function (){
         let monthLessTen = this.getMonth() < 10 ? "0": ""
@@ -279,7 +281,7 @@ export default {
         })
       }
     })
-    axios.get("http://localhost/appointments/getOverdueByInitiatorId?initiatorId="+window.localStorage.getItem('id')).then(res =>{
+    axios.get("http://localhost/appointments/getOverdueByInitiatorId?initiatorId="+window.localStorage.getItem('id')+"&type=普通预约").then(res =>{
       this.overdueAppointments = res.data
     })
     axios.get("http://localhost/appointments/getValidByInitiatorIdAndType?initiatorId="+window.localStorage.getItem('id')+"&type=绿色通道").then(res=>{

@@ -1,85 +1,91 @@
 <template>
-  <el-tabs type="border-card" style="position:fixed;left: 200px">
-    <el-tab-pane label="已入驻医院">
-      <el-table ref="verifiedHospitalData" :data="verifiedHospitalData.slice((currentPage-1)*pageSize,(currentPage-1)*pageSize+pageSize)" highlight-current-row style="width: 1000px;background-color: #FAFAFA;border:2px solid #c8c9cc;margin-top: 20px" height="500">
-        <el-table-column label="序号" width="100px" prop="rowId" />
-        <el-table-column label="医院名称" width="200px" prop="hospitalName" />
-        <el-table-column label="医院简述"  prop="hospitalDescription" >
-          <template #default="scope">
-            <el-text truncated>{{scope.row.hospitalDescription}}</el-text>
-            <el-popover placement="top" width="500" trigger="click" @hide="this.description = ''">
-              <template #reference>
-                <el-link :underline="false" @click="description = scope.row.hospitalDescription" style="position:fixed;margin-top: 8px;right: 620px "><el-icon><More /></el-icon></el-link>
-              </template>
-              <el-input type="textarea" :rows="5" v-model="description" disabled></el-input>
-            </el-popover>
-          </template>
-        </el-table-column>
-        <el-table-column align="left" width="300px">
-          <template #header>
-            <el-select
-                v-model="selectedHospital"
-                style="width: 200px"
-                filterable
-                remote
-                placeholder="输入医院名字搜索"
-                :remote-method="hospSearch"
-                :loading="isLoad"
-                clearable
-            >
-              <el-option
-                v-for="item in options"
-                :key="item.id"
-                :label="item.hospitalName"
-                :value="item.hospitalName"
-            />
-            </el-select>
-            <el-button round color="#DBEAFFFF" style="position:fixed;color: #409EFF" @click="searchHosp">搜索</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      <el-pagination
-          :current-page="currentPage"
-          :page-size="pageSize"
-          :page-sizes="[2, 5, 7, 10]"
-          :small="false"
-          :disabled="false"
-          :background="true"
-          layout="prev, pager, next, jumper, sizes"
-          :total="verifiedHospitalData.length"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          style="margin-top: 10px;margin-left: 300px"
-      />
-    </el-tab-pane>
-    <el-tab-pane label="资质审核">
-      <el-table :data="applyData" style="width: 1000px;background-color: #FAFAFA" height="500" >
-        <el-table-column label="序号" width="100px" prop="rowId" />
-        <el-table-column label="处理情况" width="120px" prop="applyState" />
-        <el-table-column label="申请者名称" width="180px" prop="initiatorName" />
-        <el-table-column label="申请类型" prop="applyType" />
-        <el-table-column label="申请时间" prop="applyTime" />
-        <el-table-column label="操作" width="230px" prop="handle" >
-          <template #default="scope">
-            <el-button size="small" @click="showDetails(scope.row.rowId-1, scope.row)"
-            >查看详细</el-button
-            >
-            <el-button
-                size="small"
-                type="success"
-                @click="passQual(scope.row.rowId-1, scope.$index)"
-            >通过</el-button
-            >
-            <el-button
-                size="small"
-                type="danger"
-                @click="rejectQual(scope.row.rowId-1, scope.$index)"
-            >驳回</el-button
-            >
-          </template>
-        </el-table-column>
-      </el-table>
-      <el-button type="primary" size="large" style="float: right" @click="handledApplyDialog = true">查看已处理申请</el-button>
+  <div>
+    <el-tabs type="border-card" style="position:fixed;left: 200px">
+      <el-tab-pane label="已入驻医院">
+        <el-table ref="verifiedHospitalData" :data="verifiedHospitalData.slice((currentPage-1)*pageSize,(currentPage-1)*pageSize+pageSize)" highlight-current-row style="width: 1000px;background-color: #FAFAFA;border:2px solid #c8c9cc;margin-top: 20px" height="500">
+          <el-table-column label="序号" width="100px" prop="rowId" />
+          <el-table-column label="医院名称" width="200px" prop="hospitalName" />
+          <el-table-column label="医院简述"  prop="hospitalDescription" >
+            <template #default="scope">
+              <el-text truncated>{{scope.row.hospitalDescription}}</el-text>
+              <el-popover placement="top" width="500" trigger="click" @hide="this.description = ''">
+                <template #reference>
+                  <el-link :underline="false" @click="description = scope.row.hospitalDescription" style="position:fixed;margin-top: 8px;right: 620px "><el-icon><More /></el-icon></el-link>
+                </template>
+                <el-input type="textarea" :rows="5" v-model="description" disabled></el-input>
+              </el-popover>
+            </template>
+          </el-table-column>
+          <el-table-column align="left" width="300px">
+            <template #header>
+              <el-select
+                  v-model="selectedHospital"
+                  style="width: 200px"
+                  filterable
+                  remote
+                  placeholder="输入医院名字搜索"
+                  :remote-method="hospSearch"
+                  :loading="isLoad"
+                  clearable
+              >
+                <el-option
+                    v-for="item in options"
+                    :key="item.id"
+                    :label="item.hospitalName"
+                    :value="item.hospitalName"
+                />
+              </el-select>
+              <el-button round color="#DBEAFFFF" style="position:fixed;color: #409EFF" @click="searchHosp">搜索</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-pagination
+            :current-page="currentPage"
+            :page-size="pageSize"
+            :page-sizes="[2, 5, 7, 10]"
+            :small="false"
+            :disabled="false"
+            :background="true"
+            layout="prev, pager, next, jumper, sizes"
+            :total="verifiedHospitalData.length"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            style="margin-top: 10px;margin-left: 300px"
+        />
+      </el-tab-pane>
+      <el-tab-pane label="资质管理">
+        <el-table :data="applyData" style="width: 1000px;background-color: #FAFAFA" height="500" >
+          <el-table-column label="序号" width="100px" prop="rowId" />
+          <el-table-column label="处理情况" width="120px" prop="applyState" />
+          <el-table-column label="申请者名称" width="180px" prop="initiatorName" />
+          <el-table-column label="申请类型" prop="applyType" />
+          <el-table-column label="申请时间" prop="applyTime" />
+          <el-table-column label="操作" width="230px" prop="handle" >
+            <template #default="scope">
+              <el-button size="small" @click="showDetails(scope.row.rowId-1, scope.row)"
+              >查看详细</el-button
+              >
+              <el-button
+                  size="small"
+                  type="success"
+                  @click="passQual(scope.row.rowId-1, scope.$index)"
+              >通过</el-button
+              >
+              <el-button
+                  size="small"
+                  type="danger"
+                  @click="rejectQual(scope.row.rowId-1, scope.$index)"
+              >驳回</el-button
+              >
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-button type="primary" size="large" style="float: right" @click="handledApplyDialog = true">查看已处理申请</el-button>
+
+      </el-tab-pane>
+
+    </el-tabs>
+    <div>
       <el-dialog v-model="detailImgDialog" title="详细信息" draggable>
         <el-image v-for="src in imgSrc" :src=src :preview-src-list="imgPreview"></el-image>
         <template #footer>
@@ -88,6 +94,7 @@
       </span>
         </template>
       </el-dialog>
+
       <el-dialog v-model="handledApplyDialog" title="已处理申请" draggable width="1100px">
         <el-table :data="handledData" style="width: 1300px;background-color: #FAFAFA" height="500" >
           <el-table-column label="序号" width="100px" prop="rowId" />
@@ -109,8 +116,10 @@
           </el-table-column>
         </el-table>
       </el-dialog>
-    </el-tab-pane>
-  </el-tabs>
+    </div>
+
+  </div>
+
 </template>
 
 <script>
@@ -224,6 +233,24 @@ export default {
               ElMessage.error("系统繁忙，请稍后再试")
             else {
               this.tableDataTrans(rowIndex, 'toHandled')
+              axios.get("http://localhost/admins/getAllHospitals").then(res=>{
+                this.verifiedHospitals.splice(0,this.verifiedHospitals.length)
+                this.verifiedHospitalData.splice(0,this.verifiedHospitalData.length)
+                for (let i = 0; i < res.data.length; i++) {
+                  if (res.data[i].qualification){
+                    this.verifiedHospitals.push(res.data[i])
+                  }
+                }
+                if (this.verifiedHospitals.length !== 0){
+                  for (let i = 0; i < this.verifiedHospitals.length; i++) {
+                    this.verifiedHospitalData.push({
+                      rowId: i+1,
+                      hospitalName: this.verifiedHospitals[i].hospitalName,
+                      hospitalDescription: this.verifiedHospitals[i].hospitalDescription,
+                    })
+                  }
+                }
+              })
             }
           })
         }

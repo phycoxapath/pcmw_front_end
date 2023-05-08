@@ -57,6 +57,10 @@ export default {
           setTimeout( ()=>{
             window.location.href = 'http://localhost:8080/'
           },1000)
+        }else if(res.data === "login fail"){
+          ElMessage.error("账号或密码错误！")
+          this.adminLoginForm.password = ""
+          this.adminLoginForm.loginName = ""
         }
       })
     }

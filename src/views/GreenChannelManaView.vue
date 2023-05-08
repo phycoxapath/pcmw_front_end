@@ -11,12 +11,8 @@
       <el-icon><Checked /></el-icon>
       <span>绿色通道预约处理</span>
     </el-menu-item>
-    <el-menu-item index="vaccine">
-      <el-icon><Checked /></el-icon>
-      <span>疫苗预约处理</span>
-    </el-menu-item>
   </el-menu>
-  <div style="position: fixed;left: 340px;top: 100px">
+  <div style="position: fixed;left: 340px;top: 100px" v-show="isQualified">
     <el-table :data="showData.slice(pageSize*(currentPage-1),pageSize+pageSize*(currentPage-1))" style="width: 1000px;background-color: #FAFAFA;border:2px solid #c8c9cc" height="500">
       <el-table-column label="序号"  prop="rowId" >
       </el-table-column>
@@ -44,7 +40,17 @@
         </template>
       </el-table-column>
       <el-table-column label="发起时间" width="200px" prop="operateTime"></el-table-column>
-      <el-table-column label="受理状况" prop="appointState" :filter-method="filterHandler" :filters="[{text:'待处理',value:'待处理'},{text:'已响应',value:'已响应'},{text:'已处理',value:'已处理'},]"></el-table-column>
+      <el-table-column label="受理状况" prop="appointState" :filter-method="filterHandler" :filters="[{text:'待处理',value:'待处理'},{text:'已响应',value:'已响应'},{text:'已处理',value:'已处理'},]">
+        <template #default="scope">
+          <span>{{scope.row.appointState}}</span>
+          <el-popover placement="top" :width="300" trigger="hover">
+            <template #reference>
+              <el-icon size="17px"><QuestionFilled /></el-icon>
+            </template>
+            <el-text style="margin-left: 20px">受理状况有：</el-text><el-text type="danger">待处理|已响应|已处理</el-text><el-text>三种，当医院响应预约后受理状况将变为已响应，当患者入院得到治疗后将变为已处理</el-text>
+          </el-popover>
+        </template>
+      </el-table-column>
       <el-table-column label="操作">
         <template #default="scope">
           <el-popconfirm title="确定要响应预约吗？" width="200px" @confirm="updateState(scope.row.rowId-1,scope.row)" confirm-button-type="danger">
@@ -99,6 +105,7 @@ export default {
   name: "GreenChannelManaView",
   data(){
     return{
+      isQualified:false,
       initiatorDetail:false,
       appendix:"",
       currentPage:1,
@@ -183,6 +190,16 @@ export default {
     }
   },
   mounted() {
+    axios.get("http://localhost/hospitals/getById?id="+window.localStorage.getItem('id')).then(res=>{
+      if (res.data.qualification){
+        this.isQualified = true
+      }else {
+        ElMessage.error("您尚未认证机构资质，请先申请认证资质！")
+        setTimeout( () =>{
+          window.location.href = 'http://localhost:8080/#/personalCenter/userQualification'
+        },1200)
+      }
+    })
     axios.get("http://localhost/appointments/getValidByHandlerIdAndType?handlerId="+window.localStorage.getItem('id')+"&type=绿色通道").then(res =>{
       this.greenChData = res.data
       Date.prototype.toLocaleString = function (){

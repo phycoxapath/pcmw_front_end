@@ -336,19 +336,25 @@ export default {
       }
     })
     axios.get("http://localhost/hospitals/getAllHospital").then(res=>{
-
+      let hospitals = []
       for (let i = 0; i < res.data.length; i++) {
-        this.deptProps.push({
-          value:res.data[i].hospitalName,
-          label:res.data[i].hospitalName,
-          children:[]
-        })
-        for (let j = 0; j < res.data[i].departments.length; j++) {
-          this.deptProps[i].children.push({
-            value:res.data[i].departments[j].id,
-            label:res.data[i].departments[j].deptName,
-        })
+        if (res.data[i].qualification){
+          hospitals.push(res.data[i])
         }
+      }
+      for (let i = 0; i < hospitals.length; i++) {
+          this.deptProps.push({
+            value: hospitals[i].hospitalName,
+            label: hospitals[i].hospitalName,
+            children: []
+          })
+          for (let j = 0; j < hospitals[i].departments.length; j++) {
+            this.deptProps[i].children.push({
+              value: hospitals[i].departments[j].id,
+              label: hospitals[i].departments[j].deptName,
+            })
+          }
+
       }
     })
     axios.get("http://localhost/apply/getByInitiatorId/?id="+window.localStorage.getItem('id')+"&role=doctors").then(res=>{

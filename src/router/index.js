@@ -153,16 +153,20 @@ const routes = [
   },
   {
     path: '/adminHome',
+    redirect: '/adminHome/hospitalMana',
+  },
+  {
+    path: '/adminHome',
     name: 'adminHome',
     component: () => import('../views/AdminViews/AdminHome'),
     children: [
       {
         path: 'hospitalMana',
-        component: () => import('../components/AdministratorService/HospitalMana'),
+        component: () => import('../components/AdministratorServiceComponents/HospitalMana'),
       },
       {
         path: 'userMana',
-        component: () => import('../components/AdministratorService/UserMana'),
+        component: () => import('../components/AdministratorServiceComponents/UserMana'),
       },
     ]
   },

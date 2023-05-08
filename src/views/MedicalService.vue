@@ -105,7 +105,11 @@ export default {
       this.show = true
     }
     axios.get("http://localhost/hospitals/getAllHospital").then(res=>{
-      this.hospitals = res.data
+      for (let i = 0; i < res.data.length; i++) {
+        if (res.data[i].qualification){
+          this.hospitals.push(res.data[i])
+        }
+      }
     })
   }
 }
