@@ -29,10 +29,19 @@
     <el-dialog v-model="appointDialog" title="预约详情" width="1050px" draggable>
       <el-table height="500" :data="appointDetail">
         <el-table-column label="序号" prop="originIndex" ></el-table-column>
-        <el-table-column label="医生姓名" prop="docName" />
+        <el-table-column label="医生姓名" prop="docName" >
+          <template #default="scope">
+            <el-popover width="200" placement="top" trigger="hover">
+              <template #reference>
+                <el-link :underline="false" @click="showDocDetail(scope.row.originIndex)">{{scope.row.docName}}</el-link>
+              </template>
+              <span>点击查看医生详细信息</span>
+            </el-popover>
+          </template>
+        </el-table-column>
         <el-table-column label="性别" prop="gender" />
         <el-table-column label="科室" prop="deptName" />
-        <el-table-column label="医生简介" prop="docProfile" />
+        <el-table-column label="医生职级" prop="docTitle" />
         <el-table-column label="预约时间段" prop="timeFragment" >
           <template #default="scope">
             <el-select  v-model="timeFragment[scope.$index]" placeholder="请选择时间段" >
@@ -59,6 +68,40 @@
         </el-table-column>
       </el-table>
     </el-dialog>
+    <el-dialog v-model="docDetailsDialog" title="医生详细信息" draggable>
+      <el-descriptions
+          class="margin-top"
+          title="医生信息"
+          :column="1"
+          size="default"
+          border
+
+      >
+      <el-descriptions-item width="300"  v-for="(attr,index) in showData" :key="index">
+        <template #label>
+          {{index}}
+        </template>
+        <span v-show="index !== '工作日' && index !=='医院简介' && index !== '医生简介'" >{{attr}}</span>
+        <el-popover width="200" trigger="hover" placement="top">
+          <template #reference>
+            <el-text v-show="index === '医生简介'" truncated>{{attr}}</el-text>
+          </template>
+          <span>{{attr}}</span>
+        </el-popover>
+
+        <span v-show="index === '工作日' && (attr & week.Mon) > 0">周一 </span>
+        <span v-show="index === '工作日' && (attr & week.Tues) > 0">周二 </span>
+        <span v-show="index === '工作日' && (attr & week.Wed) > 0">周三 </span>
+        <span v-show="index === '工作日' && (attr & week.Thur) > 0">周四 </span>
+        <span v-show="index === '工作日' && (attr & week.Fri) > 0">周五 </span>
+        <span v-show="index === '工作日' && (attr & week.Sat) > 0">周六 </span>
+        <span v-show="index === '工作日' && (attr & week.Sun) > 0">周日 </span>
+      </el-descriptions-item>
+      </el-descriptions>
+      <template #footer>
+        <el-button type="primary" @click="docDetailsDialog = false">关闭</el-button>
+      </template>
+    </el-dialog>
   </div>
 
 </template>
@@ -75,6 +118,7 @@ export default {
       timeFragment:[],
       appointDetail:[],
       appointDialog:false,
+      docDetailsDialog:false,
       hospId:0,
       deptId:0,
       hospName:"",
@@ -82,6 +126,26 @@ export default {
       doctors:[],
       range:[new Date(),new Date().setMonth(new Date().getMonth()+1)],
       appointmentDTO:{},
+      showData:{
+        工号:"",
+        姓名:"",
+        性别:"",
+        职称:"",
+        工作日:"",
+        所属科室:"",
+        医生简介:"",
+        是否取得资质:"",
+        资质类型:""
+      },
+      week:{
+        Mon:64,
+        Tues:32,
+        Wed:16,
+        Thur:8,
+        Fri:4,
+        Sat:2,
+        Sun:1
+      },
     }
   },
   methods:{
@@ -120,7 +184,7 @@ export default {
             docName: this.doctors[i].docName,
             gender: this.doctors[i].gender,
             deptName: this.doctors[i].deptName,
-            docProfile: this.doctors[i].docProfile,
+            docTitle: this.doctors[i].docTitle,
             timeFragment: data.day,
           })
         }
@@ -170,6 +234,36 @@ export default {
           ElMessage.error("系统繁忙，请稍后再试!")
       })
 
+    },
+    showDocDetail(rowIndex){
+      axios.get("http://localhost/doctors/getById?id=" + this.doctors[rowIndex].id).then(res => {
+        console.log(res.data)
+        let i = 0, j = 0
+        for (const resKey in res.data) {
+          if (resKey === 'id') {
+            continue;
+          }
+          if (resKey === 'password') {
+            continue;
+          }
+          i++;
+          for (const userKey in this.showData) {
+            j++;
+            if (i === j) {
+              if (res.data[resKey] === true || res.data[resKey] === false) {
+                this.showData[userKey] = res.data[resKey] === true ? '是' : '否'
+              } else {
+                this.showData[userKey] = res.data[resKey];
+              }
+              j = 0
+              break;
+            }
+          }
+          if (resKey === 'qualType')
+            break;
+        }
+      })
+      this.docDetailsDialog = true
     }
   },
   watch:{

@@ -80,7 +80,7 @@ export default {
         资质类型:"",
       },
       hospitalData:{
-        id:"",
+        账号:"",
         医院名称:"",
         医院简介:"",
         是否取得资质:"",
@@ -91,6 +91,7 @@ export default {
         工号:"",
         姓名:"",
         性别:"",
+        职称:"",
         工作日:"",
         所属科室:"",
         医生简介:"",
@@ -115,7 +116,7 @@ export default {
           axios.get("http://localhost/hospitals/getById?id="+window.localStorage.getItem('id')).then(res=>{
             for (let i = 0; i < res.data.departments.length; i++) {
               this.dept.push({
-                hospName:window.localStorage.getItem('loginState'),
+                hospName:res.data.hospitalName,
                 deptName:res.data.departments[i].deptName
               })
             }
@@ -140,6 +141,9 @@ export default {
             if (resKey === 'password') {
               continue;
             }
+            if (resKey === 'id') {
+              continue;
+            }
             i++;
             for (const userKey in this.showData) {
               j++;
@@ -152,6 +156,7 @@ export default {
                 j = 0
                 break;
               }
+
             }
             if (resKey === 'qualType')
               break;

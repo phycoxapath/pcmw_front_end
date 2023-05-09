@@ -341,11 +341,6 @@ export default {
             if (res.data !== 'update success')
               ElMessage.error("系统繁忙，请稍后再试")
             else {
-              for (let i = 0; i < this.userData.length; i++) {
-                if (this.applications[rowIndex].loginName === this.userData[i].loginName){
-                  this.userData[i].qualification = true
-                }
-              }
               this.tableDataTrans(rowIndex, 'toHandled')
             }
           })
@@ -384,11 +379,6 @@ export default {
       axios.put("http://localhost/apply/update",this.applyDTO).then(res=>{
         if (res.data === 'update success') {
           ElMessage.success("处理成功")
-          for (let i = 0; i < this.userData.length; i++) {
-            if (this.applications[rowIndex].loginName === this.userData[i].loginName){
-              this.userData[i].qualification = false
-            }
-          }
           this.tableDataTrans(rowIndex, 'toHandled')
         }
         else
@@ -407,7 +397,7 @@ export default {
               ElMessage.error("系统繁忙，请稍后再试")
             else {
               for (let i = 0; i < this.userData.length; i++) {
-                if (this.handledApplications[rowIndex].loginName === this.userData[i].loginName){
+                if (this.handledApplications[rowIndex].initiatorId === this.userData[i].id){
                   this.userData[i].qualification = false
                   break
                 }

@@ -48,10 +48,6 @@
       <el-icon><DocumentChecked /></el-icon>
       <span>我的预约</span>
     </el-menu-item>
-    <el-menu-item v-show="loginRole === 'hospitals'" index="/personalCenter/hospitalQualHandle">
-      <el-icon><DocumentChecked /></el-icon>
-      <span>资质审核</span>
-    </el-menu-item>
 
   </el-menu>
 </div>

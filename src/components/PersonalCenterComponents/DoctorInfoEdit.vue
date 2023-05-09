@@ -11,12 +11,18 @@
         {{index}}
       </template>
       <span v-show="index !== '医生简介'">{{attr}}</span>
-      <el-input v-model="newValue" :value="attr" v-if="index === lineIndex && index!=='性别' && index!=='医生简介'  " ></el-input>
+      <el-input v-model="newValue" :value="attr" v-if="index === lineIndex && index!=='性别' && index!=='医生简介'  && index!=='职称'  " ></el-input>
       <el-input v-model="newValue" type="textarea" :placeholder="attr" v-if="index === lineIndex && index==='医生简介'"></el-input>
       <el-radio-group v-if="index === '性别' &&index === lineIndex" v-model="newGender">
         <el-radio label="男" size="large">男</el-radio>
         <el-radio label="女" size="large">女</el-radio>
       </el-radio-group>
+      <el-select v-if="index === '职称' && index === lineIndex" v-model="newTitle">
+        <el-option label="住院医师" value="住院医师"></el-option>
+        <el-option label="主治医师" value="主治医师"></el-option>
+        <el-option label="副主任医师" value="副主任医师"></el-option>
+        <el-option label="主任医师" value="主任医师"></el-option>
+      </el-select>
       <el-link style="margin-left: 7px"  :underline="false" @click="modify(index)" v-if="attr !== '' &&attr!== null && index !=='id' && index !=='工号'&& index!== '是否取得资质' && index!== '资质类型' && index!==lineIndex" type="primary" color=" #ecf5ff" ><el-icon size="18px"><Edit/></el-icon></el-link>
       <el-link style="margin-left: 7px"  :underline="false" @click="modify(index)" v-else-if="index!=='id' && index!== '是否取得资质' && index !=='工号' && index!== '资质类型' && index !== lineIndex" type="primary" color=" #ecf5ff" ><el-icon size="18px"><CirclePlus/></el-icon></el-link>
       <el-button @click="save(index,newValue)" type="primary" color=" #ecf5ff" v-show="index === lineIndex">保存</el-button>
@@ -138,6 +144,7 @@ export default {
       deptProps:[],
       weeks:[""],
       weekShow:["",false,false,false,false,false,false,false],
+      newTitle:"",
       newGender:"",
       lineIndex:"",
       newValue:"",
@@ -146,6 +153,7 @@ export default {
         工号:"",
         姓名:"",
         性别:"",
+        职称:"",
         医生简介:"",
         是否取得资质:"",
         资质类型:""
@@ -155,6 +163,7 @@ export default {
         jobId:"",
         docName:"",
         gender:"",
+        docTitle:"",
         workingDay:"",
         docProfile:"",
         deptId:"",
@@ -182,8 +191,12 @@ export default {
         this.docSubmitData.gender = this.newGender
       }
       if (type === '医生简介'){
-        this.docBasicData.医生简介 = this.newValue
-        this.docSubmitData.docProfile = this.newValue
+        this.docBasicData.医生简介 = newValue
+        this.docSubmitData.docProfile = newValue
+      }
+      if (type === '职称'){
+        this.docBasicData.职称 = this.newTitle
+        this.docSubmitData.docTitle = this.newTitle
       }
       console.log(this.docSubmitData)
       axios.put("http://localhost/doctors",this.docSubmitData).then(res =>{

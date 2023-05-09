@@ -1,5 +1,5 @@
 <template>
-  <div style="position:absolute;top: 10%;left: 14%">
+  <div style="position:absolute;top: 15%;left: 14%">
     <el-table :data="applyData" style="width: 1300px;background-color: #FAFAFA" height="500" >
       <el-table-column label="id" prop="id" />
       <el-table-column label="处理情况" prop="applyState" />

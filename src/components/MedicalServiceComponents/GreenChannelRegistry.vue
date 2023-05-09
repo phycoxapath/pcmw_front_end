@@ -1,5 +1,5 @@
 <template>
-  <div style="position:fixed;left: 500px;top: 200px">
+  <div style="position:fixed;left: 500px;top: 200px" v-show="showForm">
     <el-popover placement="bottom" :width="500" trigger="hover" >
         <template #reference>
           <el-text style="font-size: 22px;font-weight: bolder;position:relative;bottom: 50px">{{hospName}}</el-text>
@@ -48,6 +48,7 @@ export default {
   name: "GreenChannelRegistry",
   data(){
     return{
+      showForm:false,
       hospId:this.$route.query.hospId,
       hospName:"",
       hospDescription: "",
@@ -144,7 +145,7 @@ export default {
             if (res.data.length === 0){
               this.isProcessing = false
             }
-            else this.isProcessing = res.data[res.data.length - 1] !== '已完成';
+            else this.isProcessing = res.data[res.data.length - 1] !== '已处理';
           })
         }
       }
@@ -152,6 +153,14 @@ export default {
   },
   mounted() {
     this.hospId = this.$route.query.hospId
+    axios.get("http://localhost/users/getById?id="+window.localStorage.getItem('id')).then(res=>{
+      if (!res.data.qualification){
+        ElMessage.error("您尚未取得绿色通道预约资质，请前往个人中心->资质认证进行申请！")
+        setTimeout(()=>{
+          this.$router.push('/personalCenter/userQualification')
+        },1500)
+      }else this.showForm = true
+    })
     axios.get("http://localhost/hospitals/getById?id="+this.hospId).then(res=>{
       this.hospName = res.data.hospitalName
       this.hospDescription = res.data.hospitalDescription
@@ -172,7 +181,7 @@ export default {
       if (res.data.length === 0){
         this.isProcessing = false
       }
-      else this.isProcessing = res.data[res.data.length - 1] !== '已完成';
+      else this.isProcessing = res.data[res.data.length - 1] !== '已处理';
     })
   }
 }

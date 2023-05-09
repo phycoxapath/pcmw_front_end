@@ -8,14 +8,6 @@ const routes = [
     component: HomeView
   },
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  },
-  {
     path: '/login',
     name: 'login',
     component: () => import('../views/LoginView')
@@ -75,11 +67,6 @@ const routes = [
       {
         path: 'modifyPassword',
         component: () => import('../components/PersonalCenterComponents/ModifyPassword')
-      },
-      
-      {
-        path: 'hospitalQualHandle',
-        component: () => import('../components/PersonalCenterComponents/HospitalQualHandle')
       },
 
       {
@@ -167,6 +154,21 @@ const routes = [
       {
         path: 'userMana',
         component: () => import('../components/AdministratorServiceComponents/UserMana'),
+      },
+    ]
+  },
+  {
+    path: '/hospitalDeptMana',
+    name: 'hospitalDeptMana',
+    component: () => import('../views/HospitalDeptMana'),
+    children: [
+      {
+        path: 'hospitalQualHandle',
+        component: () => import('../components/HospitalDeptManaComponents/HospitalQualHandle'),
+      },
+      {
+        path: 'doctorMana',
+        component: () => import('../components/HospitalDeptManaComponents/DoctorMana'),
       },
     ]
   },
