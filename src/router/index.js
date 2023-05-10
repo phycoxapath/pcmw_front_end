@@ -159,6 +159,10 @@ const routes = [
   },
   {
     path: '/hospitalDeptMana',
+    redirect: '/hospitalDeptMana/doctorMana'
+  },
+  {
+    path: '/hospitalDeptMana',
     name: 'hospitalDeptMana',
     component: () => import('../views/HospitalDeptMana'),
     children: [
@@ -171,6 +175,17 @@ const routes = [
         component: () => import('../components/HospitalDeptManaComponents/DoctorMana'),
       },
     ]
+  },
+  {
+    path: '/hospNoticeMana',
+    component: () => import('../views/HospNoticeMana'),
+    children: [
+      {
+        path: 'hospNotice',
+        component: () => import('../components/HospNoticeManaComponents/HospNotice')
+      },
+    ]
+
   },
 
 ]
