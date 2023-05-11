@@ -1,16 +1,24 @@
 <template>
   <el-breadcrumb separator=">" style="position:fixed;top: 100px; left: 250px">
-    <el-breadcrumb-item @click="" :to="'/hospNoticeMana/hospNotice'">homepage</el-breadcrumb-item>
+    <el-breadcrumb-item @click="" :to="'/hospNoticeMana/hospNotice'">{{ submitNewNotice.noticePublisher }}</el-breadcrumb-item>
     <el-breadcrumb-item
-    ><a href="/">{{ notices }}</a></el-breadcrumb-item
+    ><a href="/"></a></el-breadcrumb-item
     >
 
   </el-breadcrumb>
   <el-button round @click="newNoticeDialog = true" type="primary" style="position:fixed;left: 1280px;top: 100px;font-weight: bold;">发布公告</el-button>
   <div style="position: fixed;left: 280px;top: 130px">
-    <el-table ref="noticeData" :data="noticeData.slice((currentPage-1)*pageSize,(currentPage-1)*pageSize+pageSize)" style="width: 1100px;background-color: #ffffff;margin-top: 20px" height="500">
-      <el-table-column width="800" prop="noticeTitle" />
-      <el-table-column   prop="publisherName" />
+    <el-table  ref="noticeData" :data="noticeData.slice((currentPage-1)*pageSize,(currentPage-1)*pageSize+pageSize)" style="width: 1100px;background-color: #ffffff;margin-top: 20px" height="500">
+      <el-table-column width="800" prop="noticeTitle" >
+        <template #default="scope"  >
+          <el-link :underline="false" style="font-size: 18px">{{scope.row.noticeTitle}} </el-link>
+        </template>
+      </el-table-column>
+      <el-table-column  align="right" prop="noticePublisher" >
+        <template #default="scope">
+          <el-text style="font-size: 14px">{{scope.row.noticePublisher}}</el-text>
+        </template>
+      </el-table-column>
       <el-table-column   prop="postTime" />
     </el-table>
   </div>
@@ -70,6 +78,9 @@ export default {
           axios.post("http://localhost/hospitals/insertNotice", this.submitNewNotice).then(res => {
             if (res.data === 'insert success') {
               ElMessage.success("发布成功")
+              this.submitNewNotice.noticeTitle = ""
+              this.submitNewNotice.noticeMain = ""
+              this.newNoticeDialog = false
             }
           })
         }
@@ -83,10 +94,38 @@ export default {
       console.log(res.data)
       this.submitNewNotice.noticePublisher = res.data.hospitalName
     })
+    axios.get("http://localhost/hospitals/getNoticeListByHospId?hospId="+window.localStorage.getItem('id')).then(res=>{
+      Date.prototype.toLocaleString = function (){
+        let monthLessTen = this.getMonth() < 10 ? "0": ""
+        let dateLessTen = this.getDate() < 10 ? "0" : ""
+        return (
+            this.getFullYear() +
+            "-" +monthLessTen+
+            (this.getMonth() + 1) +
+            "-" +dateLessTen+
+            this.getDate()
+        );
+      }
+      this.notices = res.data
+      for (let i = 0; i < this.notices.length; i++) {
+        this.noticeData.push({
+          noticeTitle: this.notices[i].noticeTitle,
+          noticePublisher: this.notices[i].noticePublisher,
+          postTime: new Date(this.notices[i].postTime).toLocaleString()
+        })
+      }
+    })
   }
 }
 </script>
 
 <style scoped>
+
+/*::v-deep .el-table tbody tr:hover > td {*/
+/*  background-color: transparent !important;*/
+/*}*/
+:deep(.el-table tbody tr:hover > td){
+  background-color: transparent !important;
+}
 
 </style>
