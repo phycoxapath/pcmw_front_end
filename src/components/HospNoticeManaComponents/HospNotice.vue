@@ -42,6 +42,19 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-pagination
+          :current-page="currentPage"
+          :page-size="pageSize"
+          :page-sizes="[2, 5, 7, 10]"
+          :small="false"
+          :disabled="false"
+          :background="true"
+          layout="prev, pager, next, jumper, sizes"
+          :total="noticeData.length"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          style="margin-top: 10px;margin-left: 300px"
+      />
     </div>
       <div style="position: fixed;left: 280px;top: 180px;border: 2px solid #c8c9cc;width: 1080px;height: 560px;background-color: #f4f4f5" v-show="browseSpecificNotice">
         <div >
@@ -153,6 +166,13 @@ export default {
     }
   },
   methods:{
+    handleSizeChange(value){
+      this.pageSize = value
+      this.currentPage = 1
+    },
+    handleCurrentChange(value){
+      this.currentPage = value
+    },
     doSubmit(){
       this.$refs.submitNewNotice.validate(isValid => {
         if (isValid) {

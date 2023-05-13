@@ -10,7 +10,8 @@
     @select="handleSelect"
 >
   <el-menu-item index="/" style="width: 150px" >首页</el-menu-item>
-  <el-menu-item index="/adminHome" class="menu-style"  v-show="loginRole === 'admin'">管理员业务</el-menu-item>
+  <el-menu-item index="/adminHome" class="menu-style"  v-show="loginRole === 'admin'">角色管理</el-menu-item>
+  <el-menu-item index="/shoppingMana" class="menu-style"  v-show="loginRole === 'admin'">商城管理</el-menu-item>
   <el-menu-item index="/greenChannelManaView" class="menu-style" v-show="this.loginRole==='hospitals'">绿色通道受理</el-menu-item>
   <el-menu-item index="/medicalService" class="menu-style" v-show="!this.loginState||this.loginRole==='users'">医疗业务</el-menu-item>
   <el-menu-item index="/userVaccineAppoint" class="menu-style" v-show="!this.loginState||this.loginRole==='users'">疫苗预约</el-menu-item>

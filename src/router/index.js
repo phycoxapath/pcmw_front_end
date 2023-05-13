@@ -158,6 +158,25 @@ const routes = [
     ]
   },
   {
+    path: '/shoppingMana',
+    name: 'shoppingMana',
+    component: () => import('../views/AdminViews/ShoppingMana'),
+    children: [
+      {
+        path: 'addNewCommodity',
+        component: () => import('../components/ShoppingManaComponents/AddNewCommodity'),
+      },
+      {
+        path: 'modifyCommodity',
+        component: () => import('../components/ShoppingManaComponents/ModifyCommodity'),
+      },
+      {
+        path: 'orderMana',
+        component: () => import('../components/ShoppingManaComponents/OrderMana'),
+      },
+    ]
+  },
+  {
     path: '/hospitalDeptMana',
     redirect: '/hospitalDeptMana/doctorMana'
   },
@@ -178,6 +197,10 @@ const routes = [
   },
   {
     path: '/hospNoticeMana',
+    redirect: '/hospNoticeMana/hospNotice'
+  },
+  {
+    path: '/hospNoticeMana',
     component: () => import('../views/HospNoticeMana'),
     children: [
       {
@@ -185,7 +208,11 @@ const routes = [
         component: () => import('../components/HospNoticeManaComponents/HospNotice')
       },
     ]
-
+  },
+  {
+    path: '/browseNotice',
+    name: 'browseNotice',
+    component: () => import('../views/BrowseNotice'),
   },
 
 ]
