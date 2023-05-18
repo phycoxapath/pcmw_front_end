@@ -15,6 +15,9 @@ const errorHandler = (status,info)=>{
         }
         case 401:{
             ElMessage.error("Token认证失败！请重新登录")
+            window.localStorage.removeItem('loginState')
+            window.localStorage.removeItem('loginRole')
+            window.localStorage.removeItem('jwt')
             setTimeout(()=>{
                 window.location.href = "http://localhost:8080/#/administratorLogin"
             },1200)

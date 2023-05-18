@@ -70,7 +70,7 @@ export default {
       rules:{
         loginName: [
           { required: true, message: '用户名不能为空！', trigger: 'blur' },
-          { min: 2, max: 10, message: '用户名长度应为2到10个字符', trigger: 'blur' },
+          { min: 2, max: 18, message: '用户名长度应为2到18个字符', trigger: 'blur' },
         ],
         loginPassword:[
           {min:6,max:15,message: '密码长度应为6-15位',trigger: "blur"},

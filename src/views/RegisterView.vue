@@ -24,8 +24,8 @@
         </el-form-item>
       </div>
       <div v-if="radio === '机构注册'">
-        <el-form-item class="input-style" label="机构名称" prop="registerName">
-          <el-input v-model="registerForm.registerName" placeholder="输入机构名称" />
+        <el-form-item class="input-style" label="机构账号" prop="registerName">
+          <el-input v-model="registerForm.registerName" placeholder="输入机构账号" />
         </el-form-item>
       </div>
       <div v-show="radio">
@@ -93,7 +93,7 @@ export default {
         qualType:""
       },
       hospital:{
-        hospitalName: "",
+        loginName: "",
         password:"",
         qualification:false,
         qualType:""
@@ -101,7 +101,7 @@ export default {
       rules:{
         registerName:[
           { required: true, message: '用户名不能为空！', trigger: 'blur' },
-          { min: 2, max: 10, message: '用户名长度应为2到10个字符', trigger: 'blur' },
+          { min: 2, max: 18, message: '用户名长度应为2到18个字符', trigger: 'blur' },
         ],
         registerPassword:[
           {pattern : /^\S*(?=\S{6,15})(?=\S*\d)(?=\S*[A-Z])(?=\S*[a-z])\S*$/,
@@ -122,7 +122,6 @@ export default {
         if (isValid){
           this.user.loginName=this.registerForm.registerName
           this.user.jobId=this.registerForm.registerName
-          this.user.hospitalName=this.registerForm.registerName
           this.user.password=sha1(this.registerForm.registerPassword)
           this.user.qualification=this.registerForm.qualification
           if (this.radio === '用户注册'){

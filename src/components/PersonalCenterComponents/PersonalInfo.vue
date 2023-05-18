@@ -70,7 +70,6 @@ export default {
 
       },
       userData:{
-        id:"",
         用户名:"",
         姓名:"",
         性别:"",
@@ -87,7 +86,6 @@ export default {
         资质类型:""
       },
       doctorData:{
-        id:"",
         工号:"",
         姓名:"",
         性别:"",

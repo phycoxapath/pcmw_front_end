@@ -97,7 +97,7 @@ export default {
     }
   },
   mounted() {
-    if (window.localStorage.getItem('loginState') !== '' || window.localStorage.getItem('loginState') !== null) {
+    if (window.localStorage.getItem('loginState') !== '' && window.localStorage.getItem('loginState') !== null) {
       if (window.localStorage.getItem('loginRole') !== 'admin') {
         axios.get("http://localhost/" + window.localStorage.getItem('loginRole') + "/getByName?name=" + window.localStorage.getItem('loginState')).then(res => {
           window.localStorage.setItem('id', res.data.id)

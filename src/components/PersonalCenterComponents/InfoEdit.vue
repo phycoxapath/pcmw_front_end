@@ -18,8 +18,8 @@
         <el-radio label="男" size="large">男</el-radio>
         <el-radio label="女" size="large">女</el-radio>
       </el-radio-group>
-       <el-link style="margin-left: 7px" :underline="false" @click="modify(index)" v-if="attr !== '' &&attr!== null && index!=='id' && index!== '是否取得资质' && index!== '资质类型' && index!==lineIndex" type="primary" color=" #ecf5ff" ><el-icon size="18px"><Edit/></el-icon></el-link>
-      <el-link style="margin-left: 7px"  :underline="false" @click="modify(index)" v-else-if="index!=='id' && index!== '是否取得资质' && index!== '资质类型' && index !== lineIndex" type="primary" color=" #ecf5ff" ><el-icon size="18px"><CirclePlus/></el-icon></el-link>
+       <el-link style="margin-left: 7px" :underline="false" @click="modify(index)" v-if="attr !== '' &&attr!== null && index!=='id' && index!== '是否取得资质' && index!== '资质类型' && index!== '用户名' && index!==lineIndex" type="primary" color=" #ecf5ff" ><el-icon size="18px"><Edit/></el-icon></el-link>
+      <el-link style="margin-left: 7px"  :underline="false" @click="modify(index)" v-else-if="index!=='id' && index!== '是否取得资质' && index!== '资质类型' && index!== '用户名' && index !== lineIndex" type="primary" color=" #ecf5ff" ><el-icon size="18px"><CirclePlus/></el-icon></el-link>
         <el-button @click="save(index,newValue)" type="primary" color=" #ecf5ff" v-show="index === lineIndex">保存</el-button>
         <el-button @click="cancel" type="primary" color=" #ecf5ff" v-show="index === lineIndex">取消</el-button>
     </el-descriptions-item>
@@ -78,12 +78,8 @@ export default {
     //newValue双向绑定动态渲染出的所有行的输入框，但由于一次只修改一个属性，可以保证正常使用
     //点击save时传进来的newValue即为输入框中的新值
     save(type,newValue){
-      if (type === '用户名'){
-        this.userData.用户名 = newValue
-        this.user.loginName = newValue
-        window.localStorage.setItem('loginState',newValue)
-      }
-      else if (type === '性别'){
+
+      if (type === '性别'){
         this.userData.性别 = this.newGender
         this.user.gender = this.newGender
       }
