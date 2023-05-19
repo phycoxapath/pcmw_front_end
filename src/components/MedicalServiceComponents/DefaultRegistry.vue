@@ -82,9 +82,9 @@
           {{index}}
         </template>
         <span v-show="index !== '工作日' && index !=='医院简介' && index !== '医生简介'" >{{attr}}</span>
-        <el-popover width="200" trigger="hover" placement="top">
+        <el-popover width="300" trigger="hover" placement="top">
           <template #reference>
-            <el-text v-show="index === '医生简介'" truncated>{{attr}}</el-text>
+            <el-text v-show="index === '医生简介'" style="width: 300px" truncated>{{attr}}</el-text>
           </template>
           <span>{{attr}}</span>
         </el-popover>
@@ -194,7 +194,7 @@ export default {
     },
     registryAvailable(data){
       for (let i = 0; i < this.doctors.length; i++) {
-        if (data.date < new Date() || (data.date.getMonth-new Date().getMonth())*30+data.date.getDate-new Date().getDate() > 30)
+        if (data.date < new Date() || (data.date.getMonth()-new Date().getMonth())*30+data.date.getDate()-new Date().getDate() > 30)
           return false
         if ((2**((7-data.date.getDay())%7) & this.doctors[i].workingDay) > 0){
           if (this.doctors[i].remainRegistry > 0)
@@ -203,6 +203,7 @@ export default {
         if (i === this. doctors.length - 1)
           return false
       }
+
 
     },
     submitAppoint(rowIndex,row){
