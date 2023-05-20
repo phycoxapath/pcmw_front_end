@@ -42,7 +42,7 @@
         </div>
       </template>
       <div style="height: 40px" v-for="(notice,index) in recentNotices" :key="index" class="text item"><el-link @click="noticeDetailsDialog = true;showIndex = index;paragraph = notice.noticeMain.split('\n')" :underline="false">{{notice.noticeTitle}}</el-link></div>
-      <el-link style="float: right;margin-top: 70px" :underline="false" @click="this.$router.push('/browseNotice')">查看更多...</el-link>
+      <el-link style="float: right;" :underline="false" @click="this.$router.push('/browseNotice')">查看更多...</el-link>
     </el-card>
   </div>
   <div class="externalPage">
