@@ -124,7 +124,7 @@ export default {
               }
               this.isUploadImg = false
               this.imageUrl = ""
-              this.fileList = ""
+              this.fileList.splice(0,this.fileList.length)
             }
           })
         }

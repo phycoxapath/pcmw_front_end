@@ -134,6 +134,25 @@ const routes = [
     component: () => import('../views/ResetPassword')
   },
   {
+    path: '/shoppingMall',
+    redirect: '/shoppingMall/mallBrowse'
+  },
+  {
+    path: '/shoppingMall',
+    name: 'shoppingMall',
+    component: () => import('../views/ShoppingMall'),
+    children: [
+      {
+        path: 'mallBrowse',
+        component: () => import('../components/MallComponents/MallBrowse'),
+      },
+      {
+        path: 'userOrder',
+        component: () => import('../components/MallComponents/UserOrder'),
+      },
+    ]
+  },
+  {
     path: '/administratorLogin',
     name: 'administratorLogin',
     component: () => import('../views/AdminViews/AdministratorLogin')
@@ -156,6 +175,10 @@ const routes = [
         component: () => import('../components/AdministratorServiceComponents/UserMana'),
       },
     ]
+  },
+  {
+    path: '/shoppingMana',
+    redirect: '/shoppingMana/addNewCommodity'
   },
   {
     path: '/shoppingMana',

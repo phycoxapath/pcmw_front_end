@@ -17,7 +17,7 @@
   <el-menu-item index="/userVaccineAppoint" class="menu-style" v-show="!this.loginState||this.loginRole==='users'">疫苗预约</el-menu-item>
     <el-menu-item index="/appointManaView" class="menu-style" v-show="this.loginRole==='doctors'">预约管理</el-menu-item>
     <el-menu-item index="/hospitalVaccineMana" class="menu-style" v-show="this.loginRole==='hospitals'">疫苗管理</el-menu-item>
-  <el-menu-item index="3" class="menu-style" v-show="this.loginRole === 'users'|| !this.loginState">商城入口</el-menu-item>
+  <el-menu-item index="/shoppingMall" class="menu-style" v-show="this.loginRole === 'users'|| !this.loginState">商城入口</el-menu-item>
   <el-menu-item index="/hospitalDeptMana" class="menu-style" v-show="this.loginRole === 'hospitals'">科室人员管理</el-menu-item>
   <el-menu-item index="/hospNoticeMana" class="menu-style" v-show="this.loginRole === 'hospitals'">公告管理</el-menu-item>
   <div class="flex-grow" />
